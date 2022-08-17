@@ -1,0 +1,238 @@
+#                       ______   ______    __          ___      .______       __   __    __  .___  ___. 
+#                      /      | /  __  \  |  |        /   \     |   _  \     |  | |  |  |  | |   \/   | 
+#                     |  ,----'|  |  |  | |  |       /  ^  \    |  |_)  |    |  | |  |  |  | |  \  /  | 
+#                     |  |     |  |  |  | |  |      /  /_\  \   |      /     |  | |  |  |  | |  |\/|  | 
+#                     |  `----.|  `--'  | |  `----./  _____  \  |  |\  \----.|  | |  `--'  | |  |  |  | 
+#                      \______| \______/  |_______/__/     \__\ | _| `._____||__|  \______/  |__|  |__| 
+#           
+missions-info:
+    coal:
+        nowrank: hevesli
+        nextrank: kahin
+        name: §6Kahin
+        slot: 23
+        lore:
+        - §6► §712 odun kır. §8[§c{LOG}§7/§a12§8]
+        - §6► §72 saat aktif kal. §8[§c{ONLINE}§7/§a2 saat§8]
+        - §6► §7Hesabında en az 1,500 oyun parası bulundur. §8[§c{MONEY}§7/§a$1500§8]
+        - §6► §7En az 1000 ada leveline sahip ol. §8[§c{ISLEVEL}§7/§a1000§8]
+        - §r
+        missions:
+            BREAK-BLOCK:
+                LOG: 12
+            ONLINE: 7200
+            MONEY: 1500
+            ISLANDLEVEL: 1000
+        item:
+            ==: org.bukkit.inventory.ItemStack
+            type: SKULL_ITEM
+            damage: 3
+            meta:
+                ==: ItemMeta
+                meta-type: SKULL
+                display-name: §8» §b§nApple§8 «
+                lore:
+                - ''
+                - §7§oMade with DecoHeads
+                - ' '
+                internal: H4sIAAAAAAAAAE2OzW6CQBhFvzZpQkkfo1uSEQasiy7aonGIg0VRmdnxM1aGGWsQLPBUfcSy7PLknpscE8CEp23VKvVZfx9LJQy4JwU8pwXC2cSzrVRgbGGBkfWSu5k1s6eTPHNSjArPBHM8XUTdlOL6CEYjuqatxdUEgDsDHvapagX8ij5APDmhIglU3hNv5HiL1JrIy5Sc9332QTyix3355q362T/XbdKDq5gTnPg5ajO9Rytno8RyM8n17sbsoKTDvOMyLFm8kNQvJLWjjsaRw+yop/F7tfYXmsejoyPMDjuXx2HFJOmonv9wPXdC/8sNfS7pwAbaB7Njgl7HevgDn07WpxgBAAA=
+    lapis:
+        nowrank: kahin
+        nextrank: çalışkan
+        name: §6Çalışkan
+        slot: 24
+        lore:
+        - §e§nGereksinimler;
+        - §b
+        - §6► §764 odun kır §8[§c{LOG}§7/§a64§8]
+        - §6► §77 saat aktif kal §8[§c{ONLINE}§7/§a7 saat§8]
+        - §6► §716 demir cevheri kaz §8[§c{IRON_ORE}§7/§a16§8]
+        - §6► §78 altın cevheri kaz §8[§c{GOLD_ORE}§7/§a8§8]
+        - §6► §7Hesabında en az 8,000 oyun parası bulundur §8[§c{MONEY}§7/§a$8000§8]
+        - §6► §7En az 15,000 ada leveline sahip ol §8[§c{ISLANDLEVEL}§7/§a15000§8]
+        - §r
+        missions:
+            BREAK-BLOCK:
+                LOG: 64
+                IRON_ORE: 16
+                GOLD_ORE: 8
+            MONEY: 8000
+            ONLINE: 25200
+            ISLANDLEVEL: 15000
+        item:
+            ==: org.bukkit.inventory.ItemStack
+            type: IRON_ORE
+    redstone:
+        nowrank: çalışkan
+        nextrank: uzman
+        name: §6Uzman
+        slot: 29
+        lore:
+        - §e§nGereksinimler;
+        - §b
+        - §6► §796 odun kır. §8[§c{LOG}§7/§a96§8]
+        - §6► §712 saat aktif kal. §8[§c{ONLINE}§7/§a12 saat§8]
+        - §6► §748 demir cevheri kaz. §8[§c{IRON_ORE}§7/§a32§8]
+        - §6► §716 altın cevheri kaz. §8[§c{GOLD_ORE}§7/§a16§8]
+        - §6► §78 elmas cevheri kaz. §8[§c{DIAMOND_ORE}§7/§a8§8]
+        - §6► §712 zombi öldür. §8[§c{ZOMBIE}§7/§a12§8]
+        - §6► §7Hesabında en az 15,000 oyun parası bulundur §8[§c{MONEY}§7/§a15000§8]
+        - §6► §7En az 30,000 ada leveline sahip ol §8[§c{ISLANDLEVEL}§7/§a30000§8]
+        - §r
+        missions:
+            BREAK-BLOCK:
+                LOG: 96
+                IRON_ORE: 48
+                GOLD_ORE: 16
+                DIAMOND_ORE: 8
+            KILL-MOB:
+                ZOMBIE: 12
+            MONEY: 15000
+            ONLINE: 43200
+            ISLANDLEVEL: 30000
+        item:
+            ==: org.bukkit.inventory.ItemStack
+            type: COAL_ORE
+    iron_ingot:
+        nowrank: uzman
+        nextrank: profesör
+        name: §6Profesör
+        slot: 30
+        lore:
+        - §e§nGereksinimler;
+        - §b
+        - §6► §7128 odun kır. §8[§c{LOG}§7/§a128§8]
+        - §6► §724 saat aktif kal. §8[§c{ONLINE}§7/§a24 saat§8]
+        - §6► §764 demir cevheri kaz. §8[§c{IRON_ORE}§7/§a64§8]
+        - §6► §732 altın cevheri kaz. §8[§c{GOLD_ORE}§7/§a32§8]
+        - §6► §724 elmas cevheri kaz. §8[§c{DIAMOND_ORE}§7/§a24§8]
+        - §6► §732 zombi öldür. §8[§c{ZOMBIE}§7/§a32§8]
+        - §6► §7Hesabında en az 30,000 oyun parası bulundur §8[§c{MONEY}§7/§a30000§8]
+        - §6► §7En az 75,000 ada leveline sahip ol §8[§c{ISLANDLEVEL}§7/§a75000§8]
+        - §r
+        missions:
+            BREAK-BLOCK:
+                LOG: 128
+                IRON_ORE: 64
+                GOLD_ORE: 32
+                DIAMOND_ORE: 24
+            KILL-MOB:
+                ZOMBIE: 32
+            MONEY: 30000
+            ONLINE: 86400
+            ISLANDLEVEL: 75000
+        item:
+            ==: org.bukkit.inventory.ItemStack
+            type: SAND
+    gold_ingot:
+        nowrank: profesör
+        nextrank: soylu
+        name: §6Soylu
+        slot: 31
+        lore:
+        - §e§nGereksinimler;
+        - §b
+        - §6► §7256 odun kır. §8[§c{LOG}§7/§a256§8]
+        - §6► §732 saat aktif kal. §8[§c{ONLINE}§7/§a32 saat§8]
+        - §6► §796 demir cevheri kaz. §8[§c{IRON_ORE}§7/§a96§8]
+        - §6► §748 altın cevheri kaz. §8[§c{GOLD_ORE}§7/§a48§8]
+        - §6► §748 elmas cevheri kaz. §8[§c{DIAMOND_ORE}§7/§a48§8]
+        - §6► §764 zombi öldür. §8[§c{ZOMBIE}§7/§a64§8]
+        - §6► §716 iskelet öldür. §8[§c{SKELETON}§7/§a16§8]
+        - §6► §7Hesabında en az 75,000 oyun parası bulundur §8[§c{MONEY}§7/§a75000§8]
+        - §6► §7En az 120,000 ada leveline sahip ol §8[§c{ISLANDLEVEL}§7/§a120000§8]
+        - §r
+        missions:
+            BREAK-BLOCK:
+                LOG: 256
+                IRON_ORE: 96
+                GOLD_ORE: 48
+                DIAMOND_ORE: 48
+            KILL-MOB:
+                ZOMBIE: 64
+                SKELETON: 16
+            MONEY: 75000
+            ONLINE: 115200
+            ISLANDLEVEL: 120000
+        item:
+            ==: org.bukkit.inventory.ItemStack
+            type: SAND
+            damage: 1
+    diamond:
+        nowrank: soylu
+        nextrank: lord
+        name: §6Lord
+        slot: 32
+        lore:
+        - §e§nGereksinimler;
+        - §b
+        - §6► §7316 odun kır. §8[§c{LOG}§7/§a316§8]
+        - §6► §744 saat aktif kal. §8[§c{ONLINE}§7/§a44 saat§8]
+        - §6► §7128 demir cevheri kaz. §8[§c{IRON_ORE}§7/§a128§8]
+        - §6► §772 altın cevheri kaz. §8[§c{GOLD_ORE}§7/§a72§8]
+        - §6► §756 elmas cevheri kaz. §8[§c{DIAMOND_ORE}§7/§a56§8]
+        - §6► §792 zombi öldür. §8[§c{ZOMBIE}§7/§a92§8]
+        - §6► §748 iskelet öldür. §8[§c{SKELETON}§7/§a48§8]
+        - §6► §7Hesabında en az 150,000 oyun parası bulundur §8[§c{MONEY}§7/§a150000§8]
+        - §6► §7En az 160,000 ada leveline sahip ol §8[§c{ISLANDLEVEL}§7/§a160000§8]
+        - §r
+        missions:
+            BREAK-BLOCK:
+                LOG: 316
+                IRON_ORE: 128
+                GOLD_ORE: 72
+                DIAMOND_ORE: 56
+            KILL-MOB:
+                ZOMBIE: 92
+                SKELETON: 48
+            MONEY: 150000
+            ONLINE: 158400
+            ISLANDLEVEL: 160000
+        item:
+            ==: org.bukkit.inventory.ItemStack
+            type: SPONGE
+    emerald:
+        nowrank: lord
+        nextrank: overlord
+        name: §6Overlord
+        slot: 33
+        lore:
+        - §e§nGereksinimler;
+        - §b
+        - §6► §7512 odun kır. §8[§c{LOG}§7/§a512§8]
+        - §6► §764 saat aktif kal. §8[§c{ONLINE}§7/§a64 saat§8]
+        - §6► §7256 demir cevheri kaz. §8[§c{IRON_ORE}§7/§a256§8]
+        - §6► §7128 altın cevheri kaz. §8[§c{GOLD_ORE}§7/§a128§8]
+        - §6► §792 elmas cevheri kaz. §8[§c{DIAMOND_ORE}§7/§a92§8]
+        - §6► §7160 zombi öldür. §8[§c{ZOMBIE}§7/§a160§8]
+        - §6► §784 iskelet öldür. §8[§c{SKELETON}§7/§a84§8]
+        - §6► §736 blaze öldür. §8[§c{BLAZE}§7/§a36§8]
+        - §6► §7Hesabında en az 400,000 oyun parası bulundur §8[§c{MONEY}§7/§a400000§8]
+        - §6► §7En az 350,000 ada leveline sahip ol §8[§c{ISLANDLEVEL}§7/§a350000§8]
+        - §r
+        missions:
+            BREAK-BLOCK:
+                LOG: 512
+                IRON_ORE: 256
+                GOLD_ORE: 128
+                DIAMOND_ORE: 92
+            KILL-MOB:
+                ZOMBIE: 160
+                SKELETON: 84
+                BLAZE: 36
+            MONEY: 400000
+            ONLINE: 230400
+            ISLANDLEVEL: 350000
+        item:
+            ==: org.bukkit.inventory.ItemStack
+            type: SKULL_ITEM
+            damage: 3
+            meta:
+                ==: ItemMeta
+                meta-type: SKULL
+                display-name: §8» §b§nJapanese Lantern§8 «
+                lore:
+                - ''
+                - §7§oMade with DecoHeads
+                - ' '
+                internal: H4sIAAAAAAAAAE2Py06DQBiFf01MkPgYbkkGmAFZdGGstkPKKL1AmR2XoVwGbChU8bl8QGfp6svJ+c7i6AA6POzaScqP4bOspdDglhbwiDBGbklcw0NOauDMFsYTJrlhWw7OhOfiEmEddDU6i2GsxeUetFF8j9MgLjoA3GhwF6VyEvArZh/xY4WKoy/zmToq73dIvtPm7NI+mrMX6tBO9etnZzN7/1wypjGRie1XvA+nrIvQxt5Ksd6aeXe4sp+TmcSR5EtqBl1Agqaog+6t4TGrg5i1zOJV0oRmsGxtZh1MZoXKaS3WvCK+V1yFSLlS0U6aE+Gr8Iv2pleGi4V6AH9jvWT0HAEAAA==

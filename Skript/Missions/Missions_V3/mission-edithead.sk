@@ -1,0 +1,14 @@
+command /missionsedithead [<text>]:
+	permission: op
+	trigger:
+		if yaml path "missions-info.%arg-1%" of "missions" exists:
+			set yaml value "missions-info.%arg-1%.item" of "missions" to tool of player
+			send "•&f • &7Başarıyla elindeki kafa &4[&c%arg-1%&4] &7slotuna ayarlandı."
+			save yaml "missions"
+		else if yaml path "missions-info.%arg-1%" of "missions" doesn't exist:
+			send "&cBunun adında rütbe bulunamadı."
+			send ""
+			send "&cMevcut rütbeler;"
+			loop yaml nodes with keys "missions-info" of "missions":
+				send "&f • &7%loop-value%"
+			send ""

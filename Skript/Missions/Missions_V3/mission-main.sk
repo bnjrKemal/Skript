@@ -1,0 +1,55 @@
+#                       ______   ______    __          ___      .______       __   __    __  .___  ___. 
+#                      /      | /  __  \  |  |        /   \     |   _  \     |  | |  |  |  | |   \/   | 
+#                     |  ,----'|  |  |  | |  |       /  ^  \    |  |_)  |    |  | |  |  |  | |  \  /  | 
+#                     |  |     |  |  |  | |  |      /  /_\  \   |      /     |  | |  |  |  | |  |\/|  | 
+#                     |  `----.|  `--'  | |  `----./  _____  \  |  |\  \----.|  | |  `--'  | |  |  |  | 
+#                      \______| \______/  |_______/__/     \__\ | _| `._____||__|  \______/  |__|  |__| 
+#           
+options:
+	guiname: &0Rütbeler
+on load:
+	load yaml "plugins/Skript/scripts/Missions/config.yml" as "missions"
+command /rütbeler:
+	aliases: rütbe, rank
+	trigger:
+		open MissionsMain(player) to player
+command /bune?:
+	trigger:
+		send "&cHedefteki blok: &e%(target block).getType() ? ""Yok""%"
+		send "&cHedefteki entity: &e%(target entity).getType() ? ""Yok""%"
+function MissionsMain(p : player) :: inventory:
+	set metadata tag "MissionMainGUI" of {_p} to chest inventory with 6 row with name "{@guiname}"
+	set slot integers between 0 and 8 of (metadata tag "MissionMainGUI" of {_p}) to black stained glass pane named " "
+	set slot 9, 18, 27, 36, 44, 17, 26, 35 and (integers between 46 and 52) of (metadata tag "MissionMainGUI" of {_p}) to black stained glass pane named " "
+	set slot 45 of (metadata tag "MissionMainGUI" of {_p}) to arrow named "&6Geri Dön" with lore "||&7Genel menüye dönebilirsiniz.||||&8▪ &eGitmek için Tıkla!"
+	set slot 0 of (metadata tag "MissionMainGUI" of {_p}) to book named "&6Rütbe Hk." with lore "||&7Genel menüye dönebilirsiniz.||||&8▪ &eGitmek için Tıkla!"
+	set slot 53 of (metadata tag "MissionMainGUI" of {_p}) to barrier named "&6Kapat" with lore "||&7Menüleri kapatabilirsiniz.||||&8▪ &eKapatmak için Tıkla!" 
+	set slot 8 of (metadata tag "MissionMainGUI" of {_p}) to sunflower named "&6Rütbeyi güncelle" with lore "||&7Gereksinimleri sağladıysanız||&7rütbenizi güncelleyebilirsiniz.||||&8▪ &eGüncellemek için Tıkla!"
+	loop yaml nodes with keys "missions-info" of "missions":
+		add 1 to {_x}
+		set {_item} to (yaml value "missions-info.%loop-value%.item" of "missions")
+		if {_y} is not true:
+			set slot (yaml value "missions-info.%loop-value%.slot" of "missions") of (metadata tag "MissionMainGUI" of {_p}) to MissionItem2({_item}, (yaml value "missions-info.%loop-value%.name" of "missions"), "&r||&7Başarıyla tamamladın.||&r")
+		if {_y} is true:
+			set slot (yaml value "missions-info.%loop-value%.slot" of "missions") of (metadata tag "MissionMainGUI" of {_p}) to MissionItem2({_item}, (yaml value "missions-info.%loop-value%.name" of "missions"), "&r||&7Önceki rütbe tamamlanmalı.||&r")
+		if MissionsWhatGroup({_p}) is loop-value:
+			set slot (yaml value "missions-info.%loop-value%.slot" of "missions") of (metadata tag "MissionMainGUI" of {_p}) to MissionsItem({_p}, loop-value, {_item})
+			set {_y} to true
+		delete {_item}
+	return metadata tag "MissionMainGUI" of {_p}
+function MissionItem2(m : material, name: text, lore: text) :: material:
+	return {_m} named {_name} with lore {_lore}
+options:
+    timestatistic: PLAY_ONE_TICK
+import:
+    org.bukkit.Statistic
+
+on inventory click:
+	name of event-inventory = name of metadata tag "MissionMainGUI" of player
+	cancel event
+	if index of event-slot is 0:
+		UpdateRank(player)
+	if index of event-slot is 39:
+		make player say "/menü"
+	if index of event-slot is 41:
+		close player's inventory

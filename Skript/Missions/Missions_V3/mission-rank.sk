@@ -1,0 +1,52 @@
+#                       ______   ______    __          ___      .______       __   __    __  .___  ___. 
+#                      /      | /  __  \  |  |        /   \     |   _  \     |  | |  |  |  | |   \/   | 
+#                     |  ,----'|  |  |  | |  |       /  ^  \    |  |_)  |    |  | |  |  |  | |  \  /  | 
+#                     |  |     |  |  |  | |  |      /  /_\  \   |      /     |  | |  |  |  | |  |\/|  | 
+#                     |  `----.|  `--'  | |  `----./  _____  \  |  |\  \----.|  | |  `--'  | |  |  |  | 
+#                      \______| \______/  |_______/__/     \__\ | _| `._____||__|  \______/  |__|  |__| 
+#           
+function UpdateRank(p : player):
+	close {_p}'s inventory
+	MissionsWhatGroup({_p}) is not set:
+		execute console command "tm message %{_p}% &7Geçerli bir rütbede değilsiniz."
+		stop
+		
+	loop MissionsWhatBreak({_p}):
+		{missions::variables::%{_p}%::break::%loop-value%} ? 0 < yaml value "missions-info.%MissionsWhatGroup({_p})%.missions.BREAK-BLOCK.%loop-value%" of "missions"
+		execute console command "tm message %{_p}% &e%LangConv(loop-value)% &7kırma görevi tamamlanmamış"
+		stop
+		
+	loop MissionsWhatKillMob({_p}):
+		{missions::variables::%{_p}%::killmob::%loop-value%} ? 0 < yaml value "missions-info.%MissionsWhatGroup({_p})%.missions.KILL-MOB.%loop-value%" of "missions"
+		execute console command "tm message %{_p}% &e%LangConv(loop-value)% &7mob öldürme görevi tamamlanmamış."
+		stop
+		
+	if total time of {_p} ? 0 < yaml value "missions-info.%MissionsWhatGroup({_p})%.missions.ONLINE" of "missions":
+		execute console command "tm message %{_p}% &7Oynama süresi görevi tamamlanmamış."
+		stop
+	
+	if balance of {_p} < yaml value "missions-info.%MissionsWhatGroup({_p})%.missions.MONEY" of "missions":
+		execute console command "tm message %{_p}% &7Para toplama görevi tamamlanmamış."
+		stop
+	
+	if {lifetime::%{_p}%} < yaml value "missions-info.%MissionsWhatGroup({_p})%.missions.LIFETIME" of "missions":
+		execute console command "tm message %{_p}% &7Hayatta kalma süresi görevi tamamlanmamış."
+		stop
+		
+	#WolvSK şart
+	if asb island level of {_p} < yaml value "missions-info.%MissionsWhatGroup({_p})%.missions.ISLANDLEVEL" of "missions":
+		execute console command "tm message %{_p}% &7Ada leveli görevi henüz tamamlanmamış."
+		stop
+		
+	set {_newrank} to yaml value "missions-info.%MissionsWhatGroup({_p})%.nextrank" of "missions"
+	set {_p}'s group to {_newrank}
+	delete {missions::variables::%{_p}%::*}
+	open MissionsMain({_p}) to {_p}
+	send "&8[&6Rütbe&8] &f%{_p}% &7adlı oyuncu &e%{_newrank}% &7rütbesine yükseldi." to players
+
+function LangConv(t : text) :: text:
+    if "%{_t}%" is "LOG":
+        return "Odun"
+    if "%{_t}%" is "COAL_ORE":
+        return "Kömür Cevheri"
+    return "%{_t}%"
