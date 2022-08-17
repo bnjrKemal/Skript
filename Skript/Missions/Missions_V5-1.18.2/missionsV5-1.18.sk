@@ -1,0 +1,80 @@
+﻿options:
+	guiname: "&0Görevler"
+on load:
+	load yaml "plugins/Skript/scripts/Missions/config.yml" as "missions-config"
+function MissionsMain(p : player) :: inventory:
+	set {_inv} to chest inventory with 3 row with name {@guiname}
+	set slot integers between 0 and 26 of {_inv} to black stained glass pane named " "
+	set slot 0 of {_inv} to sunflower named "&aRütbeyi güncelle" with lore "&r", "&fGüncellemek için tıkla" and "&r"
+	loop yaml nodes with keys "missions-info" of "missions-config":
+		add 1 to {_x}
+		if yaml value "missions-info.%loop-value%.nowrank" of "missions-config" is {_p}'s group:
+			set slot 9 + {_x} of {_inv} to MissionsItem({_p}, loop-value)
+			set {_passed} to true
+			continue
+		if {_passed} is not true:
+			set slot 9 + {_x} of {_inv} to loop-value parsed as material named yaml value "missions-info.%loop-value%.name" of "missions-config" with lore "&r", "&aBaşarıyla tamamladın." and "&r"
+		else if {_passed} is true:
+			set slot 9 + {_x} of {_inv} to loop-value parsed as material named yaml value "missions-info.%loop-value%.name" of "missions-config" with lore "&r", "&cÖnceki görev tamamlanmalı." and "&r"
+	return {_inv}
+command /görev:
+	trigger:
+		open MissionsMain(player) to player
+on inventory click:
+	name of event-inventory is {@guiname}
+	cancel event
+	if player's inventory is event-inventory:
+		uncancel event
+		stop
+	send UpdateRank(player) to player if index of event-slot is 0
+import:
+    org.bukkit.Statistic
+function MissionsItem(p : player, nodes: text) :: material:
+	set {_lore::*} to yaml list "missions-info.%{_nodes}%.lore" of "missions-config"
+	loop yaml nodes with keys "missions-info.%{_nodes}%.missions.break" of "missions-config":
+		replace "{break%loop-value%}" with "%{missions::variables::%{_p}%::break::%loop-value%} ? 0%" in {_lore::*}
+	loop yaml nodes with keys "missions-info.%{_nodes}%.missions.kill" of "missions-config":
+		replace "{kill%loop-value%}" with "%{missions::variables::%{_p}%::kill::%loop-value%} ? 0%" in {_lore::*}
+	replace "{online}" with onlineTime(round({_p}.getStatistic(Statistic.PLAY_ONE_MINUTE)/20)) in {_lore::*}
+	replace "{money}" with "%balance of {_p}%" in {_lore::*}
+	return ({_nodes} parsed as material) named yaml value "missions-info.%{_nodes}%.name" of "missions-config" with lore {_lore::*}
+function onlineTime(süre : integer) :: text:
+	set {_return} to "&e%floor({_süre}/86400)% &7gün " if floor({_süre}/86400) > 0
+	set {_return} to "%({_return} ? """")%&e%floor(mod({_süre},86400)/3600)% &7saat " if floor(mod({_süre},86400)/3600) > 0
+	set {_return} to "%({_return} ? """")%&e%floor(mod({_süre},3600)/60)% &7dakika " if floor(mod({_süre},3600)/60) > 0
+	set {_return} to "%({_return} ? """")%&e%floor(mod({_süre},60))% &7saniye" if floor(mod({_süre},60)) > 0
+	return {_return} ? ""
+function MissionsGroupOf(p : player) :: text:
+	loop yaml nodes with keys "missions-info" of "missions-config":
+		return loop-value if {_p}'s group is yaml value "missions-info.%loop-value%.nowrank" of "missions-config"
+on death:
+	attacker is player
+	MissionsGroupOf(attacker) is set
+	set {_type} to "%type of victim%"
+	add 1 to {missions::variables::%attacker%::kill::%{_type}%}
+on break:
+	MissionsGroupOf(player) is set
+	set {_type} to "%type of event-block%"
+	add 1 to {missions::variables::%player%::break::%{_type}%}
+function UpdateRank(p : player) :: text: 
+	return "&cHerhangi geçerli rütbede değilsiniz. Tekrar deneyiniz." if MissionsGroupOf({_p}) is not set
+	set {_nodes} to MissionsGroupOf({_p})
+	loop yaml nodes with keys "missions-info.%{_nodes}%.missions.break" of "missions-config":
+		set {_requirement} to yaml value "missions-info.%{_nodes}%.missions.break.%loop-value%" of "missions-config" ? 1
+		set {_current} to {missions::variables::%{_p}%::break::%loop-value%} ? 0
+		return "&c%loop-value% görevi tamamlanmamış." if {_requirement} > {_current}
+	loop yaml nodes with keys "missions-info.%{_nodes}%.missions.kill" of "missions-config":
+		set {_requirement} to yaml value "missions-info.%{_nodes}%.missions.kill.%loop-value%" of "missions-config" ? 1
+		set {_current} to {missions::variables::%{_p}%::kill::%loop-value%} ? 0
+		return "&c%loop-value% görevi tamamlanmamış." if {_requirement} > {_current}
+	set {_onlineRequirement} to yaml value "missions-info.%{_nodes}%.missions.online" of "missions-config"
+	set {_onlineCurrent} to round({_p}.getStatistic(Statistic.PLAY_ONE_MINUTE)/20)
+	return "&cOynama süresi görevi tamamlanmamış." if {_onlineRequirement} > {_onlineCurrent}
+	set {_moneyRequirement} to yaml value "missions-info.%{_nodes}%.missions.money" of "missions-config"
+	return "&cPara biriktirme görevi tamamlanmamış" if {_moneyRequirement} > {_p}'s balance
+	set {_newrank} to yaml value "missions-info.%{_nodes}%.nextrank" of "missions-config"
+	set {_p}'s group to {_newrank}
+	delete {missions::variables::%{_p}%::*}
+	remove {_moneyRequirement} from {_p}'s balance
+	open MissionsMain({_p}) to {_p}
+	send "&a%{_p}% &7adlı oyuncu %{_newrank}% &7rütbesine &c/görev &7yaparak yükseldi. Kendisini tebrik ederiz." to players
