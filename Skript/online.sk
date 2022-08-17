@@ -1,0 +1,12 @@
+on join:
+	while player is online:
+		wait a seconds
+		Online(player)
+function Online(p : player):
+	add 1 to {now::%{_p}%}
+	if mod({now::%{_p}%}, 300) = 0:
+		set action bar of {_p} to "&f&lOnline sürene &a&l5 dk &a&leklendi. &a&l%{now::%{_p}%}%dk&f&l/&c&l1saat"
+	if {now::%{_p}%} >= 3600:
+		set action bar of {_p} to "&a&lOnline süreniz &c&l1 saat &a&loldu. &e&lAnahtar kazandınız."
+		execute console command "cc give p sıradan 1 %{_p}%"
+		delete {now::%{_p}%}

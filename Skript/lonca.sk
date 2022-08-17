@@ -1,0 +1,166 @@
+#version 0.1
+#1.8
+#papi 2.10.6 ile tab spigot
+#skript-yaml
+#ekonomik pl ile vault
+on load:
+	load yaml "plugins/Skript/scripts/lonca/data.yml" as "data"
+command /lonca [<text>] [<text>]:
+	trigger:
+		if arg-1 is not "oluştur", "davet", "kabul", "red", "sohbet", "liste" or "kapat":
+			send "&6/lonca oluştur <loncaya_verilecek_isim> &725k karşılığında lonca oluşturur."
+			send "&6/lonca davet <davet_edilecek_kişi_ismi> &7Loncaya arkadaş davet eder."
+			send "&6/lonca kabul &7Gelen davet isteğini kabul eder."
+			send "&6/lonca red &7Gelen davet isteğini reddeder."
+			send "&6/lonca sohbet <aktif/deaktif> &7Lonca sohbetini açar/kapatır."
+			send "&6/lonca liste &7Loncada bulunan kişileri listeler."
+			send "&6/lonca kapat &7Loncayı kapatır."
+			stop trigger
+		if arg-1 is "oluştur":
+			if haslonca(player) is true:
+				send "&cZaten loncaya sahipsin."
+				stop trigger
+			if arg-2 is not set:
+				send "&cLoncaya verilecek isim yazmalısın. &e/lonca oluştur <isim>"
+				stop trigger
+			if hasloncaname(arg-2) is true:
+				send "&cZaten bu isimde lonca var."
+				stop trigger
+			if player's balance < 25000:
+				send "&cLonca kurmak için yeterli paran yok."
+				stop trigger
+			createlonca(player, arg-2)
+		if arg-1 is "davet":
+			if arg-2 is not set:
+				send "&cOyuncu belirtmelisin."
+				stop trigger
+			if arg-2 parsed as player is player:
+				send "&cKendi kendine davet atmanın anlamı ne?"
+				stop trigger
+			if arg-2 parsed as player is not online:
+				send "&cBelirlenen oyuncu sunucuda olmalı."
+				stop trigger
+			if haslonca(arg-2 parsed as player) is true:
+				send "&cBelirlenen oyuncu zaten başka loncada."
+				stop trigger
+			if ownerlonca(player) is not player:
+				send "&cÜzgünüm, loncanın lideri olmalısın."
+				stop trigger
+			if {lonca::davet::bekleniyor::%arg-2%} is set:
+				send "&cBaşka loncadan belirlenen oyuncuya gelen davet var. Reddedilirse tekrar gönder."
+				stop trigger
+			send "&a%arg-2% adlı oyuncuya lonca davet gönderildi. 30 saniye süresi var."
+			send "&a%player% adlı oyuncu seni loncaya davet ediyor. 30 saniye süreniz var." to arg-2 parsed as player
+			set {lonca::davet::bekleniyor::%arg-2%} to player
+			wait 30 seconds
+			{lonca::davet::bekleniyor::%arg-2%} is set
+			send "&cLonca davet isteği kabul edilmediği için iptal edildi." to player and arg-2 parsed as player
+			delete {lonca::davet::bekleniyor::%arg-2%}
+			stop trigger
+		if arg-1 is "kabul":
+			if {lonca::davet::bekleniyor::%player%} is not set:
+				send "&cGönderilen davet istek yok."
+				stop trigger
+			addmemberslonca({lonca::davet::bekleniyor::%player%}, player)
+			stop trigger
+		if arg-1 is "red":
+			if {lonca::davet::bekleniyor::%player%} is not set:
+				send "&cGönderilen davet istek yok."
+				stop trigger
+			send "&aDavet isteği reddedildi." to player
+			send "&6%player% &ctarafından davet isteği reddedildi." to {lonca::davet::bekleniyor::%player%} parsed as player
+			delete {lonca::davet::bekleniyor::%player%}
+			stop trigger
+		if arg-1 is "sohbet":
+			if haslonca(player) is false:
+				send "&cHerhangi bir loncada üye değilsin."
+				stop trigger
+			if {lonca::sohbet::%player%} is not set:
+				set {lonca::sohbet::%player%} to true
+				send "&aLonca sohbeti aktif."
+				stop trigger
+			delete {lonca::sohbet::%player%}
+			send "&cLonca sohbeti de-aktif."
+			stop trigger
+		if arg-1 is "liste":
+			if haslonca(player) is false:
+				send "&cHerhangi bir loncada üye değilsin."
+				stop trigger
+			send "&c&m=========================="
+			send ""
+			send "&f• &7Lonca listesi"
+			send "&cLonca lideri &f» &c%ownerlonca(player)%" 
+			loop listingmemberslonca(player):
+				loop-value is not ownerlonca(player)
+				send "&2Lonca üyesi &f» &a%loop-value%"
+			send ""
+			send "&c&m=========================="
+			stop trigger
+		if arg-1 is "kapat":
+			if haslonca(player) is false:
+				send "&cHerhangi bir loncada üye değilsin."
+				stop trigger
+			if ownerlonca(player) is not player:
+				send "&cLonca lideri kapatabilir."
+				stop trigger
+			send "&cLonca kapatıldı."
+			deletelonca(player)
+			updatenametaglonca(player)
+			stop trigger
+on chat:
+	{lonca::sohbet::%player%} is set
+	send "&8[&d%namelonca(player)%&8] &6%player% &f» &e%message%" to listingmemberslonca(player)
+	cancel event
+on quit:
+	delete {lonca::sohbet::%player%}
+function deletelonca(p : player):
+	loop listingmemberslonca({_p}):
+		if loop-value is online:
+			send "&c%{_p}% adlı oyuncu tarafından lonca kapatıldı." to loop-value
+			updatenametaglonca(loop-value) 
+		if loop-value is offline:
+			execute console command "essentials:mail %loop-value% &c%{_p}% adlı oyuncu tarafından %namelonca({_p})% isimli lonca kapatıldı."
+		delete {lonca::davet::bekleniyor::%loop-value%} and {lonca::sohbet::%loop-value%}
+		delete yaml value "teams.%namelonca({_p})%" of "data" and yaml value "data.%loop-value%" of "data"
+		save yaml "data"
+function haslonca(p : player) :: boolean:
+	if yaml value "data.%{_p}%" of "data" is set:
+		return true
+	return false
+function hasloncaname(t: text) :: boolean:
+	if contains(yaml nodes with keys "teams" of "data", {_t}) is true:
+		return true
+	return false
+function contains(os: objects, o: object) :: boolean:
+	loop {_os::*}:
+		loop-value is {_o}
+		return true
+	return false
+function createlonca(p : player, t: text):
+	send "&aBaşarıyla lonca oluşturuldu. Arkadaşlarını davet etmek için &e/lonca davet <oyuncu>" to {_p}
+	remove 25000 from {_p}'s balance
+	set yaml value "data.%{_p}%" of "data" to {_t}
+	set yaml value "teams.%{_t}%.owner" of "data" to {_p}
+	updatenametaglonca({_p})
+	save yaml "data"
+function ownerlonca(p : player) :: player:
+	set {_name} to yaml value "data.%{_p}%" of "data"
+	return yaml value "teams.%{_name}%.owner" of "data" ? "" parsed as offline player
+function namelonca(p : player) :: text:
+	return yaml value "data.%{_p}%" of "data"
+function listingmemberslonca(p : player) :: players:
+	return yaml list "teams.%namelonca({_p})%.members" of "data" and yaml value "teams.%namelonca({_p})%.owner" of "data"
+function addmemberslonca(owner : player, members : player):
+	send "&aDavet isteği kabul edildi. %namelonca({_owner})% adlı loncaya katıldın." to {_members}
+	send "&aDavet isteği kabul edildi. &6%{_members}% &aadlı oyuncu &e%namelonca({_owner})% &aadlı loncaya katıldı." to {_owner}
+	add {_members} to yaml list "teams.%namelonca({_owner})%.members" of "data"
+	delete {lonca::davet::bekleniyor::%{_members}%}
+	updatenametaglonca({_members})
+	save yaml "data"
+function updatenametaglonca(p : player):
+	if haslonca({_p}) is true:
+		set {lonca::forpapi::%{_p}%} to namelonca({_p})
+	if haslonca({_p}) is false:
+		set {lonca::forpapi::%{_p}%} to ""
+on join:
+	updatenametaglonca(player)
