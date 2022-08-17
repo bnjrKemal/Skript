@@ -1,0 +1,54 @@
+function UpdateRank(p : player):
+	loop yaml nodes with keys "missions-info" of "missions":
+		{_p}'s group = yaml value "missions-info.%loop-value%.nowrank" of "missions"
+		set {_list} to loop-value
+		stop loop
+	if {_list} is not set:
+		send "&cHerhangi geçerli rütbede değilsiniz. Tekrar deneyiniz." to {_p}
+		stop
+	set {_breaklog} to yaml value "missions-info.%{_list}%.missions.breaklog" of "missions"
+	set {_breakcoal} to yaml value "missions-info.%{_list}%.missions.breakcoal" of "missions"
+	set {_breakiron} to yaml value "missions-info.%{_list}%.missions.breakiron" of "missions"
+	set {_breakgold} to yaml value "missions-info.%{_list}%.missions.breakgold" of "missions"
+	set {_online} to yaml value "missions-info.%{_list}%.missions.online" of "missions"
+	set {_killzombie} to yaml value "missions-info.%{_list}%.missions.killzombie" of "missions"
+	set {_killskeleton} to yaml value "missions-info.%{_list}%.missions.killskeleton" of "missions"
+	set {_money} to yaml value "missions-info.%{_list}%.missions.money" of "missions"
+	set {_killblaze} to yaml value "missions-info.%{_list}%.missions.killblaze" of "missions"
+	set {_breakdiamond} to yaml value "missions-info.%{_list}%.missions.breakdiamond" of "missions"
+		
+	if {_breaklog} ? 0 > {missions::variables::%{_p}%::breaklog} ? 1:
+		send "&cOdun kırma görevi tamamlanmamış." to {_p}
+		stop
+	if {_breakcoal} ? 0 > {missions::variables::%{_p}%::breakcoal} ? 1:
+		send "&cKömür cevheri kırma görevi tamamlanmamış." to {_p}
+		stop
+	if {_breakiron} ? 0 > {missions::variables::%{_p}%::breakiron} ? 1:
+		send "&cDemir cevheri kırma görevi tamamlanmamış." to {_p}
+		stop
+	if {_breakgold} ? 0 > {missions::variables::%{_p}%::breakgold} ? 1:
+		send "&cAltın cevheri kırma görevi tamamlanmamış." to {_p}
+		stop
+	if {_online} > total time of {_p}:
+		send "&cOynama süresi görevi tamamlanmamış." to {_p}
+		stop
+	if {_killzombie} ? 0 > {missions::variables::%{_p}%::killzombie} ? 1:
+		send "&cZombi öldürme görevi tamamlanmamış" to {_p}
+		stop
+	if {_killskeleton} ? 0 > {missions::variables::%{_p}%::killskeleton} ? 1:
+		send "&cZombi öldürme görevi tamamlanmamış" to {_p}
+		stop
+	if {_money} ? 0 > balance of {_p} ? 1:
+		send "&cPara biriktirme görevi tamamlanmamış" to {_p}
+		stop
+	if {_breakdiamond} ? 0 > {missions::variables::%{_p}%::breakdiamond} ? 1:
+		send "&cElmas cevheri kırma görevi tamamlanmamış" to {_p}
+		stop
+	if {_killblaze} ? 0 > {missions::variables::%{_p}%::killblaze} ? 1:
+		send "&cZombi öldürme görevi tamamlanmamış" to {_p}
+		stop
+	set {_newrank} to yaml value "missions-info.%{_list}%.nextrank" of "missions"
+	execute console command "manuadd %{_p}% %{_newrank}%"
+	delete {missions::variables::%{_p}%::*}
+	open MissionsMain({_p}) to {_p}
+	send "&a%{_p}% &7adlı oyuncu %{_newrank}% &7rütbesine &c/görev &7yaparak yükseldi. Kendisini tebrik ederiz." to players

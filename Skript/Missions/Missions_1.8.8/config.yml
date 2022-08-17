@@ -1,0 +1,184 @@
+missions-info:
+    coal:
+        nowrank: "Gezgin"
+        nextrank: "işci"
+        name: '§aİşçi'
+        lore:
+        - '§bİşçi olmak için yapman gerekenler;'
+        - '§r'
+        - '§f• §716 odun kır. §c{breaklog}§f/§a16'
+        - '§f• §716 kömür cevheri kaz. §c{breakcoal}§f/§a16'
+        - '§f• §71 saat aktif kal. §c{online}§f/§a1 saat'
+        - '§f• §710 zombi öldür. §c{killedzombie}§f/§a10'
+        - '§f• §7Hesabında en az 1K oyun parası bulundur. §c{money}§f/§a1K'
+        - '§r'
+        missions:
+            breaklog: 16
+            breakcoal: 16
+            online: 3600
+            killzombie: 10
+            money: 1000
+    redstone:
+        nowrank: "işci"
+        nextrank: "Şehirli"
+        name: '§aŞehirli'
+        lore:
+        - '§bŞehirli olmak için yapman gerekenler;'
+        - '§b'
+        - '§f• §732 odun kır. §c{breaklog}§f/§a32'
+        - '§f• §74 saat aktif kal. §c{online}§f/§a4 saat'
+        - '§f• §716 demir cevheri kaz. §c{breakiron}§f/§a16'
+        - '§f• §78 altın cevheri kaz. §c{breakgold}§f/§a8'
+        - '§f• §720 zombi öldür. §c{killedzombie}§f/§a20'
+        - '§f• §710 iskelet öldür. §c{killediskelet}§f/§a10'
+        - '§f• §7Hesabında en az 3K oyun parası bulundur. §c{money}§f/§a3K'
+        - '§r'
+        missions:
+            breaklog: 32
+            breakiron: 16
+            breakgold: 8
+            online: 14400
+            killzombie: 20
+            killskeleton: 10
+            money: 3000
+    lapis:
+        nowrank: "Şehirli"
+        nextrank: "Tüccar"
+        name: '§aTüccar'
+        lore:
+        - '§bTüccar olmak için yapman gerekenler;'
+        - '§b'
+        - '§f• §764 odun kır. §c{breaklog}§f/§a64'
+        - '§f• §78 saat aktif kal. §c{online}§f/§a8 saat'
+        - '§f• §732 demir cevheri kaz. §c{breakiron}§f/§a32'
+        - '§f• §716 altın cevheri kaz. §c{breakgold}§f/§a16'
+        - '§f• §78 elmas cevheri kaz. §c{breakdiamond}§f/§8'
+        - '§f• §732 zombi öldür. §c{killedzombie}§f/§a32'
+        - '§f• §732 iskelet öldür. §c{killediskelet}§f/§a32'
+        - '§f• §78 blaze öldür. §c{killedblaze}§f/§a8'
+        - '§f• §7Hesabında en az 6K oyun parası bulundur. §c{money}§f/§a6K'
+        - '§r'        
+        missions:
+            breaklog: 64
+            breakiron: 32
+            breakgold: 16
+            breakdiamond: 8
+            online: 28800
+            killzombie: 32
+            killskeleton: 32
+            killblaze: 8
+            money: 6000
+    iron ingot:
+        nowrank: "Tüccar"
+        nextrank: "Gardiyan"
+        name: '§aGardiyan'
+        lore:
+        - '§bGardiyan olmak için yapman gerekenler;'
+        - '§b'
+        - '§r'
+        - '§f• §7128 odun kır. §c{breaklog}§f/§a128'
+        - '§f• §712 saat aktif kal. §c{online}§f/§a12 saat'
+        - '§f• §764 demir cevheri kaz. §c{breakiron}§f/§a64'
+        - '§f• §732 altın cevheri kaz. §c{breakgold}§f/§a32'
+        - '§f• §716 elmas cevheri kaz. §c{breakdiamond}§f/§a16'
+        - '§f• §748 zombi öldür. §c{killedzombie}§f/§a48'
+        - '§f• §736 iskelet öldür. §c{killedskeleton}§f/§a36'
+        - '§f• §716 blaze öldür. §c{killedblaze}§f/§a16'
+        - '§f• §710 örümcek öldür. §c{killedspider}§f/§a10'
+        - '§f• §7Hesabında en az 10K oyun parası bulundur. §c{money}§f/§a10K'
+        - '§r'
+        missions:
+            breaklog: 128
+            breakiron: 64
+            breakgold: 32
+            breakdiamond: 16
+            online: 43200
+            killzombie: 48
+            killskeleton: 36
+            killblaze: 16
+            money: 10000
+    gold ingot:
+        nowrank: "Gardiyan"
+        nextrank: "Şövalye"
+        name: '§aŞövalye'
+        lore:
+        - '§bŞövalye olmak için yapman gerekenler;'
+        - '§b'
+        - '§r'
+        - '§f• §7256 odun kır. §c{breaklog}§f/§a256'
+        - '§f• §716 saat aktif kal. §c{online}§f/§a16 saat'
+        - '§f• §796 demir cevheri kaz. §c{breakiron}§f/§a96'
+        - '§f• §764 altın cevheri kaz. §c{breakgold}§f/§a64'
+        - '§f• §748 elmas cevheri kaz. §c{breakdiamond}§f/§a48'
+        - '§f• §764 zombi öldür. §c{killedzombie}§f/§a64'
+        - '§f• §748 iskelet öldür. §c{killedskeleton}§f/§a48'
+        - '§f• §764 blaze öldür. §c{killedblaze}§f/§a64'
+        - '§f• §732 örümcek öldür. §c{killedspider}§f/§a32'
+        - '§f• §7Hesabında en az 20K oyun parası bulundur. §c{money}§f/§a20K'
+        - '§r'
+        missions:
+            breaklog: 256
+            breakiron: 96
+            breakgold: 64
+            breakdiamond: 48
+            online: 57600
+            killzombie: 64
+            killskeleton: 48
+            killblaze: 64
+            money: 20000
+    diamond:
+        nowrank: "Şövalye"
+        nextrank: "Soylu"
+        name: '§aSoylu'
+        lore:
+        - '§bSoylu olmak için yapman gerekenler;'
+        - '§b'
+        - '§f• §7512 odun kır. §c{breaklog}§f/§a512'
+        - '§f• §724 saat aktif kal. §c{online}§f/§a24 saat'
+        - '§f• §7128 demir cevheri kaz. §c{breakiron}§f/§a128'
+        - '§f• §7128 altın cevheri kaz. §c{breakgold}§f/§a128'
+        - '§f• §796 elmas cevheri kaz. §c{breakdiamond}§f/§a96'
+        - '§f• §7128 zombi öldür. §c{killedzombie}§f/§a128'
+        - '§f• §7128 iskelet öldür. §c{killedskeleton}§f/§a128'
+        - '§f• §796 blaze öldür. §c{killedblaze}§f/§a96'
+        - '§f• §764 örümcek öldür. §c{killedspider}§f/§a64'
+        - '§f• §7Hesabında en az 25K oyun parası bulundur. §c{money}§f/§a25K'
+        - '§r'
+        missions:
+            breaklog: 512
+            breakiron: 128
+            breakgold: 128
+            breakdiamond: 96
+            online: 86400
+            killzombie: 128
+            killskeleton: 128
+            killblaze: 96
+            money: 25000
+    emerald:
+        nowrank: "Soylu"
+        nextrank: "Asil"
+        name: '§aAsil'
+        lore:
+        - '§bAsil olmak için yapman gerekenler;'
+        - '§b'
+        - '§f• §71024 odun kır. §c{breaklog}§f/§a1024'
+        - '§f• §772 saat aktif kal. §c{online}§f/§a72 saat'
+        - '§f• §7256 demir cevheri kaz. §c{breakiron}§f/§a256'
+        - '§f• §7230 altın cevheri kaz. §c{breakgold}§f/§a230'
+        - '§f• §7200 elmas cevheri kaz. §c{breakdiamond}§f/§a200'
+        - '§f• §7300 zombi öldür. §c{killedzombie}kill§f/§a300'
+        - '§f• §7210 iskelet öldür. §c{killedskeleton}§f/§a210'
+        - '§f• §7128 blaze öldür. §c{killedblaze}§f/§a128'
+        - '§f• §7215 örümcek öldür. §c{killedspider}§f/§a215'
+        - '§f• §7Hesabında en az 50K oyun parası bulundur. §c{money}§f/§a50K'
+        - '§r'
+        missions:
+            breaklog: 1024
+            breakiron: 256
+            breakgold: 230
+            breakdiamond: 200
+            online: 259200
+            killzombie: 300
+            killskeleton: 210
+            killblaze: 128
+            money: 50000

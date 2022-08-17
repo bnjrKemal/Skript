@@ -1,0 +1,31 @@
+on break:
+	if event-block is any log:
+		add 1 to {missions::variables::%player%::breaklog}
+	if event-block is coal ore:
+		add 1 to {missions::variables::%player%::breakcoal}
+	if event-block is iron ore:
+		add 1 to {missions::variables::%player%::breakiron}
+	if event-block is gold ore:
+		add 1 to {missions::variables::%player%::breakgold}
+	if event-block is diamond ore:
+		add 1 to {missions::variables::%player%::breakdiamond}
+on death:
+	if "%attacker.getType()%" = "PLAYER":
+		if "%victim.getType()%" = "ZOMBIE":
+			add 1 to {missions::variables::%attacker%::killzombie}
+		if "%victim.getType()%" = "SKELETON":
+			add 1 to {missions::variables::%attacker%::killskeleton}
+		if "%victim.getType()%" = "BLAZE":
+			add 1 to {missions::variables::%attacker%::killblaze}
+		if "%victim.getType()%" = "SPIDER":
+			add 1 to {missions::variables::%attacker%::killspider}
+options:
+    timestatistic: PLAY_ONE_TICK
+import:
+    org.bukkit.Statistic
+players property total time:
+    return type: integer
+    get:
+        return round(expression-1.getStatistic(Statistic.{@timestatistic})/20)		
+function onlineTime(süre : integer) :: text:
+	return "&e%floor({_süre}/86400)% &7gün, &e%floor(mod({_süre},86400)/3600)% &7saat, &e%floor(mod({_süre},3600)/60)% &7dakika, &e%floor(mod({_süre},60))% &7saniye"
