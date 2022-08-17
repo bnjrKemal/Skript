@@ -1,0 +1,69 @@
+on load:
+	load yaml "plugins/Skript/scripts/Market/config.yml" as "config"
+	loop all offline players:
+		delete metadata tag "MarketMain" of loop-offline player if metadata tag "MarketMain" of loop-offline player is set
+function MarketMain(p : player) :: inventory:
+	if metadata tag "MarketMain" of {_p} is not set:
+		set metadata tag "MarketMain" of {_p} to chest inventory with (yaml value "row" of "config") row with name yaml value "guiname" of "config"
+		set slot integers between 0 and (9 * (yaml value "row" of "config") - 1) of (metadata tag "MarketMain" of {_p}) to (yaml value "slotfrom0to26" of "config" parsed as material) named " "
+		loop yaml nodes with keys "market" of "config":
+			set slot (yaml value "market.%loop-value%.slot" of "config") of (metadata tag "MarketMain" of {_p}) to (yaml value "market.%loop-value%.icon" of "config" parsed as material) named loop-value
+	return (metadata tag "MarketMain" of {_p})
+on inventory click:
+	if event-inventory = metadata tag "MarketMain" of player:
+		cancel event
+		yaml path "market.%name of event-slot%" of "config" exists
+		open MarketSubmain(player, name of event-slot) to player
+	if event-inventory = metadata tag "MarketSubmain" of player:
+		cancel event
+		if index of event-slot is yaml value "market.%name of event-inventory%.row" of "config" * 9 - 1:
+			open MarketMain(player) to player
+			stop
+		if event-slot is not air:
+			open MarketSelling(player, "%event-item.getType()%", name of event-inventory) to player
+	if event-inventory = metadata tag "MarketSelling" of player:
+		cancel event
+		event-slot is not air
+		if index of event-slot is yaml value "market.%name of event-inventory%.backicon-slot" of "config":
+			open MarketSubmain(player, name of event-inventory) to player
+			stop
+		if event-slot is not air:
+			set {_lore::*} to lore of event-item
+			set {_price} to uncolored {_lore::4} parsed as integer
+			set {_item} to event-item
+			delete lore of {_item}
+			if player has {_item}:
+				add {_price} to player's balance
+				remove {_item} from player's inventory
+				set {_send::*} to yaml list "sell-message.successfully" of "config"
+				replace "{item}" with "%event-item%" in {_send::*}
+				replace "{price}" with "%{_price}%" in {_send::*}
+				replace "{amount}" with "%item amount of event-item%" in {_send::*}
+				send {_send::*}
+				stop
+			else:
+				send yaml list "sell-message.unsuccessfully" of "config"
+function MarketSelling(p : player, m: text, i : text) :: inventory:
+	set metadata tag "MarketSelling" of {_p} to chest inventory with 3 row with name {_i}
+	loop 1, 2, 4, 8, 16, 32 and 64:
+		set {_lore::*} to yaml list "lore" of "config"
+		set {_price} to yaml value "market.%{_i}%.items.%{_m}%" of "config" * loop-number
+		replace "{sell}" with "%{_price}%" in {_lore::*}
+		set slot {_x} + 10 of (metadata tag "MarketSelling" of {_p}) to loop-number of ({_m} parsed as material) with lore {_lore::*} and "&0%{_price}%" 
+		add 1 to {_x}
+	set slot (yaml value "market.%{_i}%.backicon-slot" of "config") of (metadata tag "MarketSelling" of {_p}) to yaml value "market.%{_i}%.backicon" of "config" parsed as material named yaml value "market.%{_i}%.backicon-name" of "config"
+	return metadata tag "MarketSelling" of {_p}
+function MarketSubmain(p : player, c : text) :: inventory:
+	set metadata tag "MarketSubmain" of {_p} to chest inventory with yaml value "market.%{_c}%.row" of "config" row with name {_c}
+	loop yaml nodes with keys "market.%{_c}%.items" of "config":
+		set {_lore::*} to yaml list "lore" of "config"
+		set {_price} to yaml value "market.%{_c}%.items.%loop-value%" of "config"
+		replace "{sell}" with "%{_price}%" in {_lore::*}
+		set slot {_x} + 0 of (metadata tag "MarketSubmain" of {_p}) to loop-value parsed as material with lore {_lore::*}
+		add 1 to {_x}
+	# (yaml value "backicon-slot" of "config") #
+	set slot yaml value "market.%{_c}%.row" of "config" * 9 - 1 of (metadata tag "MarketSubmain" of {_p}) to yaml value "backicon" of "config" parsed as material named yaml value "backicon-name" of "config"
+	return metadata tag "MarketSubmain" of {_p}
+command /market:
+	trigger:
+		open MarketMain(player) to player
