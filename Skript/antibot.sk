@@ -1,0 +1,12 @@
+#Minecraft sunucuları için yabancı ülkelerden gelen oyuncuların sunucuya girmesini engelleme ve basit bot koruma skripti (sk-mirror, sk-json ve sk-reqn gerekli)
+
+on server list ping:
+    set {ServerListPing::%event.getAddress()%} to true if {ServerListPing::%event.getAddress()%} is not set
+on join:
+    send a request to "http://ip-api.com/json/%ip of player%"
+    map json body of last response to {json::*}
+    if {json::countryCode} is "TR":
+        {ServerListPing::/%ip of player%} is not true
+        kick player because "&cBotlardan korunmak amacıyla sunucu IP'imizi sunucu listesine eklemelisin. Eklediysen sunucu listeyi yenile."
+    else:
+        kick player because "&cÜlkeniz bu sunucudan yasaklı. &7Your country has banned from this server."
