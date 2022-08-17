@@ -1,0 +1,23 @@
+function vectorForSettings(l: location, x: integer=90, y: integer=16, z: integer=90) :: location:
+
+	set {_return.x} to (x-coordinate of {_l}) - (x-coordinate of findmaincoord({_l}, {_x}, {_y}, {_z}, world of {_l}))
+	set {_return.y} to (y-coordinate of {_l}) - (y-coordinate of findmaincoord({_l}, {_x}, {_y}, {_z}, world of {_l}))
+	set {_return.z} to (z-coordinate of {_l}) - (z-coordinate of findmaincoord({_l}, {_x}, {_y}, {_z}, world of {_l}))
+			
+	return location({_return.x}, {_return.y}, {_return.z}, world of {_l})
+
+function convertedFromVectorToRealLoc(v: location, l: location) :: location:
+	set {_find.x} to x-coordinate of findmaincoord({_l})
+	set {_find.y} to y-coordinate of findmaincoord({_l})
+	set {_find.z} to z-coordinate of findmaincoord({_l})
+	
+	set {_vector.x} to x-coordinate of {_v}
+	set {_vector.y} to y-coordinate of {_v}
+	set {_vector.z} to z-coordinate of {_v}
+	
+	set {_return.x} to {_find.x} + {_vector.x}
+	set {_return.y} to {_find.y} + {_vector.y}
+	set {_return.z} to {_find.z} + {_vector.z}
+	
+	return location({_return.x}, {_return.y}, {_return.z}, world of {_l})
+	

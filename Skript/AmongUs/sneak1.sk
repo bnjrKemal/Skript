@@ -1,0 +1,54 @@
+on sneak toggle:
+	player is not sneaking
+	if player is op:
+		stop if {ventilation::location::*} is set
+	#Impostor(player) is true
+	VentsContains(block below player) is true
+	if player's walk speed is not 0:
+		setVentofPlayer(player, true)
+	else if player's walk speed is 0:
+		setVentofPlayer(player, false)
+
+function VentsContainsObjects(l : location, os: objects) :: boolean:
+	loop {_os::*}:
+		VentsContains(vectorForSettings(loop-value)) is true
+		return true
+	return false
+
+function VentsContains(l : location) :: boolean:
+	loop yaml nodes with keys "ventilation-location" of "ventilation.location":
+		x-coordinate of {_l} is x-coordinate of vectorForSettings({_l})
+		y-coordinate of {_l} is y-coordinate of vectorForSettings({_l})
+		z-coordinate of {_l} is z-coordinate of vectorForSettings({_l})
+		world of {_l} is world of vectorForSettings({_l})
+		return true
+	return false
+function VentsLocations(l : location) :: locations: # VentsLocations(vector)
+	loop yaml nodes with keys "ventilation-location" of "ventilation.location":
+		x-coordinate of {_l} is x-coordinate of vectorForSettings({_l})
+		y-coordinate of {_l} is y-coordinate of vectorForSettings({_l})
+		z-coordinate of {_l} is z-coordinate of vectorForSettings({_l})
+		world of {_l} is world of vectorForSettings({_l})
+		return yaml list "ventilation-location.%loop-value%" of "ventilation.location"
+function VentsTeleport(l : location) :: location:
+	set {_vents::*} to VentsLocations({_l})
+	loop {_vents::*}:
+		loop-value is vectorForSettings({_l})
+		return {_vents::%(loop-index parsed as integer) + 1%} ? {_vents::1}
+function setVentofPlayer(p : player, b: boolean):
+	if {_b} is true:
+		apply invisibility 1 to {_p}
+		set {_p}'s walk speed to 0
+		set {_p}'s fly speed to 0
+		send subtitle yaml value "message.ventingplayer.invent" of "message" to {_p}
+	else if {_b} is false:
+		remove invisibility from {_p}
+		set {_p}'s walk speed to 0.2
+		set {_p}'s fly speed to 0.1
+		send subtitle yaml value "message.ventingplayer.outvent" of "message" to {_p}
+on jump:
+	#Impostor(player) is true
+	player's walk speed is 0
+	cancel event
+	wait a tick
+	teleport player to block above convertedFromVectorToRealLoc(VentsTeleport(block below player), location of player)

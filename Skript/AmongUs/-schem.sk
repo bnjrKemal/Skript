@@ -1,0 +1,28 @@
+import:
+	java.io.File
+	org.bukkit.Bukkit
+	org.bukkit.plugin.PluginManager
+	org.bukkit.util.Vector
+	com.sk89q.worldedit.Vector
+	com.sk89q.worldedit.bukkit.BukkitWorld
+	com.sk89q.worldedit.bukkit.WorldEditPlugin
+	com.sk89q.worldedit.EditSession
+	com.sk89q.worldedit.EditSessionFactory
+	#com.sk89q.worldedit.CuboidClipboard
+	#com.sk89q.worldedit.schematic.MCEditSchematicFormat
+	#com.sk89q.worldedit.schematic.SchematicFormat
+	
+function loadSchematicx(l : location, t : text):
+	set {_schem} to new File("Among Us/schematics/%{_t}%.schematic")
+	set {_worldedit} to Bukkit.getPluginManager().getPlugin("WorldEdit")
+	set {_bukkitworld} to new BukkitWorld({_l}.getWorld(), null and 1000)
+	
+	set {_session} to WorldEditPlugin.getWorldEdit().getEditSessionFactory().getEditSession({_l}.getWorld())
+	
+	set {_clipboard} to MCEditSchematicFormat.getFormat({_schem}).load({_schem})
+	{_clipboard}.paste({_session}, new Vector({_l}.getX(), {_l}.getY(), null and {_l}.getZ()), null and false)
+	
+	
+	
+	
+	#set {_session} to {_worldedit}.getWorldEdit().getEditSessionFactory().getEditSession({_bukkitworld})

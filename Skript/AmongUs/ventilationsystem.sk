@@ -1,0 +1,47 @@
+on rightclick:
+	player is op
+	tool of player is blaze rod named "&8&nVentilation System Settings"
+	if player is not sneaking:
+		if "%(block below player).getType()%" is not "IRON_TRAPDOOR":
+			send subtitle yaml value "message.ventilationsystem.invalidbelowblock" of "message"
+		else if VentsContainsObjects(block below player, VentsLocations(block below player)) is true:
+			send subtitle yaml value "message.ventilationsystem.already" of "message"
+		else if VentsContainsObjects(block below player, VentsLocations(block below player)) is true:
+			remove VentsLocations(block below player) from {ventilation::location::*}
+			send subtitle yaml value "message.ventilationsystem.remove" of "message"
+		else if VentsContainsObjects(VentsLocations(block below player), {ventilation::location::*}) is not true:
+			set {_l} to vectorForSettings(block below player)
+			set yaw of {_l} to yaw of player
+			set pitch of {_l} to pitch of player
+			add {_l} to {ventilation::location::*}
+			send subtitle yaml value "message.ventilationsystem.add" of "message"
+	else if player is sneaking:
+		if {ventilation::location::*} is not set:
+			send subtitle yaml value "message.ventilationsystem.none" of "message"
+		else if {ventilation::location::*} is set:
+			if size of {ventilation::location::*} < 2:
+				send subtitle yaml value "message.ventilationsystem.nowasone" of "message"
+			else if size of {ventilation::location::*} >= 2:
+				addVentilationLocationToYAML({ventilation::location::*})
+				send subtitle yaml value "message.ventilationsystem.successfully" of "message"
+on load:
+	load yaml "plugins/Among Us/settings/ventilation-location.yml" as "ventilation.location" 
+
+function addVentilationLocationToYAML(os: objects):
+	{ventilation::location::*} is set
+	loop integers between 0 and 100:
+		yaml path "ventilation-location.%loop-number%" of "ventilation.location" doesn't exist
+		set yaml list "ventilation-location.%loop-number%" of "ventilation.location" to {ventilation::location::*}
+		stop loop
+	save yaml "ventilation.location"
+	delete {ventilation::location::*}
+	
+on tool change:
+	{ventilation::location::*} is set
+	tool of player is not blaze rod named "&8&nVentilation System Settings"
+	delete {ventilation::location::*}
+	send subtitle yaml value "message.ventilationsystem.delete" of "message"
+on quit:
+	{ventilation::location::*} is set
+	delete {ventilation::location::*}
+	

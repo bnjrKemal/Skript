@@ -1,0 +1,14 @@
+on rightclick on any stairs:
+	AmongUsRideStairs(player, location below event-block)
+
+function AmongUsRideStairs(p : player, l : location):
+    spawn armor stand at {_l}
+    set {_entity} to last spawned entity
+    ({_entity}).setVisible(false)
+    make {_p} ride {_entity}
+    while {_entity} exists:
+        if {_p} is sneaking:
+            eject any passenger of {_entity}
+            wait 2 ticks
+            delete {_entity}
+        wait 5 tick

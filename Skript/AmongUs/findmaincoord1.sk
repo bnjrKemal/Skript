@@ -1,0 +1,8 @@
+function findmaincoord(l : location, x: integer=90, y: integer=16, z: integer=90, w: world=(world "TheSkeld")) :: location:
+	set {_return.x} to x-coordinate of {_l}
+	set {_return.y} to y-coordinate of {_l}
+	set {_return.z} to z coordinate of {_l}
+	set {_return.x} to {_return.x}+({_x}/2) - mod({_return.x}+({_x}/2), {_x})
+	set {_return.y} to {_return.y}+({_y}/2) - mod({_return.y}+({_y}/2), {_y})
+	set {_return.z} to {_return.z}+({_z}/2) - mod({_return.z}+({_z}/2), {_z})
+	return location({_return.x}, {_return.y}, {_return.z}, {_w})

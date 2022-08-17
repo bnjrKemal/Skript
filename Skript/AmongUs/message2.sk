@@ -1,0 +1,2 @@
+on load:
+	load yaml "plugins/Among Us/message.yml" as "message"

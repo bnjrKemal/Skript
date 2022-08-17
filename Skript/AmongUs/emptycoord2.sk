@@ -1,0 +1,11 @@
+function returncoord(x: integer=0, k :integer=90) :: location:
+	loop integers between -1 * {_x} and {_x}:
+		loop integers between -1 * {_x} and {_x}:
+			block at location(loop-number-1 * {_k}, 8, loop-number-2 * {_k}, world "TheSkeld") is air
+			return location(loop-number-1 * {_k}, 8, loop-number-2 * {_k}, world "TheSkeld")
+function emptycoord(i : integer=90) :: location:
+	{_i} is not 0
+	set {_x} to 0
+	while returncoord({_x}, {_i}) is not set:
+		add 1 to {_x}
+	return returncoord({_x}, {_i})

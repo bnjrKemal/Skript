@@ -1,0 +1,13 @@
+on load:
+	load yaml "plugins/Among Us/settings/default-location.yml" as "defloc"
+on rightclick:
+	player is op
+	send "%(clicked block).getType()%"
+	if "%(clicked block).getType()%" = "IRON_TRAPDOOR":
+		if contains(yaml list "default-location.vents" of "defloc", (target block).getLocation()) is true:
+			remove (target block).getLocation() from yaml list "default-location.vents" of "defloc"
+			send yaml value "message.default-location.remove" of "message"
+		else if contains(yaml list "default-location.vents" of "defloc", (target block).getLocation()) is false:
+			add (target block).getLocation() to yaml list "default-location.vents" of "defloc"
+			send yaml value "message.default-location.add" of "message"
+		save yaml "defloc"
