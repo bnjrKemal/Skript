@@ -12,6 +12,16 @@ function emptyCoord(y: integer=0, world: text="world") :: location:
 #emptyCoord(world "TheSkield") or
 #emptyCoord(64, world "TheSkield")
 
+function findmaincoord(l : location, k : integer=90) :: location:
+    set {_x} to x-coordinate of {_l}
+    set {_y} to 8
+    set {_z} to z coordinate of {_l}
+    set {_x} to {_x}+({_k}/2) - mod({_x}+({_k}/2), {_k})
+    set {_z} to {_z}+({_k}/2) - mod({_z}+({_k}/2), {_k})
+    return location({_x}, {_y}, {_z}, world "TheSkeld")
+
+
+# Java
 int firstLoc = 0;
 int lastLoc = 0;
 
