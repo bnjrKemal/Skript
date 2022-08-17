@@ -1,0 +1,50 @@
+options:
+	guiname: &0Görevler
+on load:
+	load yaml "plugins/Missions/config.yml" as "missions"
+	delete {okey::*}
+command /görev:
+	trigger:
+		open MissionsMain(player) to player
+function MissionsMain(p : player) :: inventory:
+	set metadata tag "MissionMainGUI" of {_p} to chest inventory with 3 row with name "{@guiname}"
+	set slot integers between 0 and 26 of (metadata tag "MissionMainGUI" of {_p}) to black stained glass pane named " "
+	set slot 0 of (metadata tag "MissionMainGUI" of {_p}) to sunflower named "&aRütbeyi güncelle" with lore "&r||&fGüncellemek için tıkla||&r"
+	loop yaml nodes with keys "missions-info" of "missions":
+		add 1 to {_x}
+		if yaml value "missions-info.%loop-value%.nowrank" of "missions" is {_p}'s group:
+			set slot 9 + {_x} of (metadata tag "MissionMainGUI" of {_p}) to MissionsItem({_p}, loop-value)
+			set {okey::%{_p}%} to true
+			continue
+		if {okey::%{_p}%} is not true:
+			set slot 9 + {_x} of (metadata tag "MissionMainGUI" of {_p}) to loop-value parsed as material named yaml value "missions-info.%loop-value%.name" of "missions" with lore "&r", "&aBaşarıyla tamamladın." and "&r"
+		else if {okey::%{_p}%} is true:
+			set slot 9 + {_x} of (metadata tag "MissionMainGUI" of {_p}) to loop-value parsed as material named yaml value "missions-info.%loop-value%.name" of "missions" with lore "&r", "&cÖnceki görev tamamlanmalı." and "&r"
+	delete {okey::%{_p}%}
+	return metadata tag "MissionMainGUI" of {_p}
+
+options:
+    timestatistic: PLAY_ONE_MINUTE
+import:
+    org.bukkit.Statistic
+
+function MissionsItem(p : player, t: text) :: material:
+	set {_lore::*} to yaml list "missions-info.%{_t}%.lore" of "missions"
+	replace "{breaklog}" with "%{missions::variables::%{_p}%::breaklog} ? 0%" in {_lore::*}	
+	replace "{breakcoal}" with "%{missions::variables::%{_p}%::breakcoal} ? 0%" in {_lore::*}	
+	replace "{breakdiamond}" with "%{missions::variables::%{_p}%::breakdiamond} ? 0%" in {_lore::*}	
+	replace "{killedzombie}" with "%{missions::variables::%{_p}%::killzombie} ? 0%" in {_lore::*}	
+	replace "{killediskelet}" with "%{missions::variables::%{_p}%::killskeleton} ? 0%" in {_lore::*}	
+	replace "{killedblaze}" with "%{missions::variables::%{_p}%::killblaze} ? 0%" in {_lore::*}	
+	replace "{killedskeleton}" with "%{missions::variables::%{_p}%::killskeleton} ? 0%" in {_lore::*}	
+	replace "{killedspider}" with "%{missions::variables::%{_p}%::killspider} ? 0%" in {_lore::*}	
+	replace "{breakiron}" with "%{missions::variables::%{_p}%::breakiron} ? 0%" in {_lore::*}	
+	replace "{breakgold}" with "%{missions::variables::%{_p}%::breakgold} ? 0%" in {_lore::*}
+	replace "{online}" with onlineTime(round({_p}.getStatistic(Statistic.PLAY_ONE_MINUTE)/20)) in {_lore::*}
+	replace "{money}" with "%balance of {_p}%" in {_lore::*}
+	return ({_t} parsed as material) named yaml value "missions-info.%{_t}%.name" of "missions" with lore {_lore::*}
+
+on inventory click:
+	event-inventory = metadata tag "MissionMainGUI" of player
+	cancel event
+	UpdateRank(player) if index of event-slot is 0
