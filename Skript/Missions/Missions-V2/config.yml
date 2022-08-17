@@ -1,0 +1,78 @@
+missions-info:
+    coal:
+        nowrank: "Gezgin"
+        nextrank: "işci"
+        name: '§aİşçi'
+        lore:
+        - '§bİşçi olmak için yapman gerekenler;'
+        - '§r'
+        - '§f• §716 odun kır. §c{OAK_LOG}§f/§a16'
+        - '§f• §716 kömür cevheri kaz. §c{COAL_ORE}§f/§a16'
+        - '§f• §71 saat aktif kal. §c{ONLINE}§f/§a1 saat'
+        - '§f• §710 zombi öldür. §c{ZOMBIE}§f/§a10'
+        - '§f• §71 saat boyunca ölmeden hayatta kal. §c{LIFETIME}§f/§a1 saat'
+        - '§f• §7Hesabında en az 1K oyun parası bulundur. §c{MONEY}§f/§a1K'
+        - '§r'
+        missions:
+            BREAK-BLOCK:
+                OAK_LOG: 16
+                COAL_ORE: 16
+            KILL-MOB:
+                ZOMBIE: 10
+            ONLINE: 3600
+            MONEY: 1000
+            LIFETIME: 1 hours
+    redstone:
+        nowrank: "işci"
+        nextrank: "Şehirli"
+        name: '§aŞehirli'
+        lore:
+        - '§bŞehirli olmak için yapman gerekenler;'
+        - '§b'
+        - '§f• §732 odun kır. §c{OAK_LOG}§f/§a32'
+        - '§f• §74 saat aktif kal. §c{ONLINE}§f/§a4 saat'
+        - '§f• §716 demir cevheri kaz. §c{IRON_ORE}§f/§a16'
+        - '§f• §78 altın cevheri kaz. §c{GOLD_ORE}§f/§a8'
+        - '§f• §720 zombi öldür. §c{ZOMBIE}§f/§a20'
+        - '§f• §710 iskelet öldür. §c{SKELETON}§f/§a10'
+        - '§f• §7Hesabında en az 3K oyun parası bulundur. §c{MONEY}§f/§a3K'
+        - '§r'
+        missions:
+            BREAK-BLOCK:
+                OAK_LOG: 32
+                IRON_ORE: 32
+                GOLD_ORE: 8
+            KILL-MOB:
+                ZOMBIE: 20
+                SKELETON: 10
+            MONEY: 3000
+            ONLINE: 14400
+    lapis:
+        nowrank: "Şehirli"
+        nextrank: "Tüccar"
+        name: '§aTüccar'
+        lore:
+        - '§bTüccar olmak için yapman gerekenler;'
+        - '§b'
+        - '§f• §764 odun kır. §c{OAK_LOG}§f/§a64'
+        - '§f• §78 saat aktif kal. §c{ONLINE}§f/§a8 saat'
+        - '§f• §732 demir cevheri kaz. §c{IRON_ORE}§f/§a32'
+        - '§f• §716 altın cevheri kaz. §c{GOLD_ORE}§f/§a16'
+        - '§f• §78 elmas cevheri kaz. §c{DIAMOND_ORE}§f/§8'
+        - '§f• §732 zombi öldür. §c{ZOMBIE}§f/§a32'
+        - '§f• §732 iskelet öldür. §c{SKELETON}§f/§a32'
+        - '§f• §78 blaze öldür. §c{BLAZE}§f/§a8'
+        - '§f• §7Hesabında en az 6K oyun parası bulundur. §c{MONEY}§f/§a6K'
+        - '§r'        
+        missions:
+            BREAK-BLOCK:
+                OAK_LOG: 64
+                IRON_ORE: 32
+                GOLD_ORE: 16
+                DIAMOND_ORE: 8
+            KILL-MOB:
+                ZOMBIE: 32
+                SKELETON: 32
+                BLAZE: 8
+            MONEY: 6000
+            ONLINE: 28800

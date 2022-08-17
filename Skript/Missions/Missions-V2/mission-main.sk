@@ -1,0 +1,35 @@
+options:
+	guiname: &0Görevler
+on load:
+	load yaml "plugins/Skript/scripts/Missions/config.yml" as "missions"
+command /görev:
+	trigger:
+		open MissionsMain(player) to player
+command /bune?:
+	trigger:
+		send "&cHedefteki blok: &e%(target block).getType() ? ""Yok""%"
+		send "&cHedefteki entity: &e%(target entity).getType() ? ""Yok""%"
+function MissionsMain(p : player) :: inventory:
+	set metadata tag "MissionMainGUI" of {_p} to chest inventory with 3 row with name "{@guiname}"
+	set slot integers between 0 and 26 of (metadata tag "MissionMainGUI" of {_p}) to black stained glass pane named " "
+	set slot 0 of (metadata tag "MissionMainGUI" of {_p}) to sunflower named "&aRütbeyi güncelle" with lore "", "&fGüncellemek için tıkla." and ""
+	loop yaml nodes with keys "missions-info" of "missions":
+		add 1 to {_x}
+		if MissionsWhatGroup({_p}) is loop-value:
+			set slot 9 + {_x} of (metadata tag "MissionMainGUI" of {_p}) to MissionsItem({_p}, loop-value)
+			set {_y} to true
+			continue
+		if {_y} is not true:
+			set slot 9 + {_x} of (metadata tag "MissionMainGUI" of {_p}) to loop-value parsed as material named yaml value "missions-info.%loop-value%.name" of "missions" with lore "&r", "&aBaşarıyla tamamladın." and "&r"
+		if {_y} is true:
+			set slot 9 + {_x} of (metadata tag "MissionMainGUI" of {_p}) to loop-value parsed as material named yaml value "missions-info.%loop-value%.name" of "missions" with lore "&r", "&cÖnceki görev tamamlanmalı." and "&r"
+	return metadata tag "MissionMainGUI" of {_p}
+options:
+    timestatistic: PLAY_ONE_MINUTE
+import:
+    org.bukkit.Statistic
+
+on inventory click:
+	event-inventory = metadata tag "MissionMainGUI" of player
+	cancel event
+	UpdateRank(player) if index of event-slot is 0
