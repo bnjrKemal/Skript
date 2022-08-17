@@ -1,0 +1,38 @@
+function EventGUI(p : player, t: text) :: inventory:
+	set metadata tag "EventGUI" of {_p} to chest inventory with 3 row named "&0Event öğeleri » %{_t}%"
+	set slot integers between 0 and 26 of (metadata tag "EventGUI" of {_p}) to black stained glass pane named " "
+	set slot 4 of (metadata tag "EventGUI" of {_p}) to chest named "&b1. sandık"
+	set slot 12 of (metadata tag "EventGUI" of {_p}) to chest named "&b2. sandık"
+	set slot 14 of (metadata tag "EventGUI" of {_p}) to chest named "&b3. sandık"
+	set slot 19 of (metadata tag "EventGUI" of {_p}) to chest named "&b4. sandık"
+	set slot 20 of (metadata tag "EventGUI" of {_p}) to chest named "&b5. sandık"
+	set slot 21 of (metadata tag "EventGUI" of {_p}) to chest named "&b6. sandık"
+	set slot 22 of (metadata tag "EventGUI" of {_p}) to chest named "&b7. sandık"
+	set slot 23 of (metadata tag "EventGUI" of {_p}) to chest named "&b8. sandık"
+	set slot 24 of (metadata tag "EventGUI" of {_p}) to chest named "&b9. sandık"
+	set slot 25 of (metadata tag "EventGUI" of {_p}) to chest named "&b10. sandık"
+	return (metadata tag "EventGUI" of {_p})
+function EventSettingsGUI(p : player, i: integer, t: text) :: inventory:
+	loop 4, 12, 14, 19, 20, 21, 22, 23, 24 and 25:
+		add 1 to {_x}
+		loop-number is {_i}
+		stop loop
+	set metadata tag "EventSettingsGUI.%{_t}%" of {_p} to chest inventory with 3 row with name "&0Event Öğe Ayarlama &4%{_x}%;%{_t}%"
+	loop {eventitems-%{_t}%::%{_x}%::*}:
+		set slot {_} + 0 of (metadata tag "EventSettingsGUI.%{_t}%" of {_p}) to loop-value
+		add 1 to {_}
+	return (metadata tag "EventSettingsGUI.%{_t}%" of {_p})
+on inventory click:
+	if name of event-inventory contains "&0Event öğeleri » ":
+		cancel event
+		set {_t} to name of event-inventory
+		replace "&0Event öğeleri » " with "" in {_t}
+		event-slot is chest
+		open EventSettingsGUI(player, ("%index of event-slot%" parsed as integer), {_t}) to player
+on inventory close:
+	set {_} to name of event-inventory
+	{_} contains "&0Event Öğe Ayarlama &4"
+	replace "&0Event Öğe Ayarlama &4" with "" in {_}
+	set {_a::*} to {_} split at ";"
+	set {eventitems-%{_a::2}%::%{_a::1}%::*} to items in event-inventory
+	send "&aBaşarıyla güncellendi. [%{_a::1}%;%{_a::2}%]"

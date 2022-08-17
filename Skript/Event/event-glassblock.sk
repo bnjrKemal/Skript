@@ -1,0 +1,49 @@
+function StartGlassBlock(t: text):
+	if {basladi.%{_t}%} is not set:
+		set {basladi.%{_t}%} to true
+	else if {basladi.%{_t}%} is set:
+		delete {basladi.%{_t}%}
+		stop
+	loop 300 times:
+		if {basladi.%{_t}%} is not set:
+			send "&cBaşlatılan %{_t}% event iptal edildi. Sebebi hatalı olabilir." to players
+			stop loop
+		if contains(blocks within {pos1-%{_t}%} to {pos2-%{_t}%}, yellow glass) is false:
+			StopGlassBlock({_t})
+			stop loop
+		set {_} to {eventmessage::ltm}
+		loop-number = 271 or 291, 292, 293, 294, 295, 296, 297, 299 or 300:
+			replace "{time}" with "%(301 - loop-number)% saniye" in {_}
+			replace "{event}" with "%{_t}%" in {_}
+			send {_} to players
+		loop-number = 1 or 61:
+			replace "{time}" with "%(301 - loop-number)/60% dakika" in {_}
+			replace "{event}" with "%{_t}%" in {_}
+			send {_} to players
+		wait a seconds
+	{basladi.%{_t}%} is true
+	set {_} to {eventmessage::est}
+	replace "{event}" with {_t} in {_}
+	send {_} to players
+	delete {list-%{_t}%::*}
+	loop blocks within {pos1-%{_t}%} to {pos2-%{_t}%}:
+		loop-value is yellow glass
+		add location of loop-value to {list-%{_t}%::*}
+		set loop-value to air
+	afteronemincloseevent({_t})
+
+function afteronemincloseevent(t : text):
+	loop 10 times:
+		if {basladi.%{_t}%} is set:
+			wait a minutes
+		if {basladi.%{_t}%} is not set:
+			stop loop
+	StopGlassBlock({_t})
+	
+function StopGlassBlock(t : text):
+	loop {list-%{_t}%::*}:
+		set block at loop-value to yellow glass
+	set {_} to {eventmessage::fsh}
+	replace "{event}" with "%{_t}%" in {_}
+	send {_} to players
+	delete {list-%{_t}%::*}, {event-%{_t}%::*}, {event-bitti} and {event-bittimi}, {basladi.%{_t}%}

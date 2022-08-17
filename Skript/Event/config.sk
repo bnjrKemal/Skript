@@ -1,0 +1,15 @@
+on load:
+	delete {eventmessage::*}
+	set {_} to "&7Event &f»"
+	set {eventmessage::est} to "%{_}% &e{event} event başladı."
+	set {eventmessage::agi} to "%{_}% &eZaten ödülü aldın."
+	set {eventmessage::fsh} to "%{_}% &c{event} event sona erdi."
+	set {eventmessage::nfe} to "%{_}% &cBu adında bir event bulunamadı."
+	set {eventmessage::tpe} to "%{_}% &c{event} evente ışınlandın."
+	set {eventmessage::ltm} to "%{_}% &a{event} event'e {time} kaldı."
+	set {eventmessage::tfw} to "%{_}% &aSuya atladığın için {event} spawn'a ışınlandın."
+	set {eventmessage::mtp} to "%{_}% &aEvent oyuncu sayısı aştığından event bitti."
+	set {eventmessage::cbp} to "%{_}% &a{player} adlı oyuncu {sandıksırası}. sandık aldı. {kalansandık} sandık kaldı."
+	
+	set {eventmessage::met} to 10 minutes           #Event süresi
+	set {eventmessage::mpe} to 10                   #Event max oyuncu sayısı

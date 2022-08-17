@@ -1,0 +1,18 @@
+on rightclick:
+	PlayerInEvent(player) is set
+	contains(blocks within {pos1-%PlayerInEvent(player)%} to {pos2-%PlayerInEvent(player)%}, yellow glass) is false
+	if contains({event-%PlayerInEvent(player)%::*}, player) is true:
+		send {eventmessage::agi}
+		stop
+	add player to {event-%PlayerInEvent(player)%::*}
+	set {_x} to size of {event-%PlayerInEvent(player)%::*}
+	add {eventitems-%PlayerInEvent(player)%::%{_x}%::*} to player's inventory
+	set {_} to {eventmessage::cbp}
+	replace "{player}" with "%player%" in {_}
+	replace "{sandıksırası}" with "%{_x}%" in {_}
+	replace "{kalansandık}" with "%{eventmessage::mpe} - {_x}%" in {_}
+	send {_} to players
+	teleport player to {eventspawn-%PlayerInEvent(player)%}
+	if size of {event-%PlayerInEvent(player)%::*} >= {eventmessage::mpe}:
+		send {eventmessage::mtp} to players
+		StopGlassBlock(PlayerInEvent(player))

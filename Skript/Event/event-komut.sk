@@ -1,0 +1,105 @@
+function EventCreate(t : text):
+	add {_t} to {events::load::*}
+
+function EventRemove(t : text):
+	remove {_t} from {events::load::*}
+
+function EventHas(t : text) :: boolean:
+	return contains({events::load::*}, {_t})
+
+function EventList() :: texts:
+	if {events::load::*} is set:
+		return {events::load::*}
+	else:
+		return "&cHenüz oluşturulmamış."
+
+command /eventcmd [<text>] [<text>]:
+	trigger:
+		if player is op:
+			if arg-1 is not "item", "spawn" or "pos1", "pos2", "kaldır", "liste", "oluştur":
+				EventHelp(player)
+				stop trigger
+				
+			if arg-1 is "oluştur":
+				if arg-2 is not set:
+					send "&cEvent'in adını yazmalısın."
+					stop trigger
+				if arg-2 is set:
+					if EventHas(arg-2) is true:
+						send "&cZaten bu adında event mevcut."
+						stop trigger
+					EventCreate(arg-2)
+					send "&a%arg-2% event oluşturuldu."
+					stop trigger
+			
+			if arg-1 is "liste":
+				loop EventList():
+					send "&3• &e%loop-value%" to player
+				stop trigger
+				
+			if arg-2 is not set:
+				send "&cEventin adını belirlemelisin. Kayıtlı event adlar; %EventList()%"
+				stop trigger
+			if EventHas(arg-2) is false:
+				send "&cBöyle bir adında event yok, oluşturmalısın."
+				stop trigger
+			if arg-1 is "item":
+				open EventGUI(player, arg-2) to player
+			if arg-1 is "kaldır":
+				EventRemove(arg-2)
+				send "&a%arg-2% event kaldırıldı."
+				stop trigger
+			if arg-1 is "spawn":
+				set {eventspawn-%arg-2%} to location of player
+				send "&7Event&f » &a(%arg-2%) spawn yeri ayarlandı."
+			if arg-1 is "pos1":
+				set {pos1-%arg-2%} to player's location
+				send "&epos1 ayarlandı."
+			if arg-1 is "pos2":
+				set {pos2-%arg-2%} to player's location
+				send "&epos2 ayarlandı."
+		executor is console
+		arg-1 is "başlat"
+		if arg-2 is not set:
+			send "&cEventi belirlemelisin." to console
+			stop trigger
+		if EventHas(arg-2) is not set:
+			send "&cBöyle bir adında event bulunamadı." to console
+			stop trigger
+		StartGlassBlock(arg-2)
+function EventHelp(p : player):
+	send "" to {_p}
+	send "&e/eventcmd oluştur <event-adı> &7Eventi kaydeder." to {_p}
+	send "&e/eventcmd kaldır <event-adı> &7Eventi kaldırır." to {_p}
+	send "&e/eventcmd liste &7Kaydedilen eventi listeler." to {_p}
+	send "&e/eventcmd item <event-adı> &7Event'te verilecek öğelerini ayarlar." to {_p}
+	send "&e/eventcmd spawn <event-adı> &7Event spawnı ayarlar." to {_p}
+	send "&e/eventcmd pos1 <event-adı> &7Event alanı için birinci nokta." to {_p}
+	send "&e/eventcmd pos2 <event-adı> &7Event alanı için ikinci nokta." to {_p}
+	send "" to {_p}
+	send "&4!KONSOL! &c/eventcmd başlat (%EventList()%) &7Eventi başlatır." to {_p}
+	send "" to {_p}
+	send "&bEvent'in adları;" to {_p}
+	loop EventList():
+		send "&3• &e%loop-value%" to {_p}
+	send "" to {_p}
+function contains(os: objects, o: object) :: boolean:
+	loop {_os::*}:
+		loop-value is {_o}
+		return true
+	return false
+command /event [<text>]:
+	trigger:
+		if arg-1 is not set:
+			loop EventList():
+				send "&3• &e%loop-value%" to player
+			stop trigger
+		if EventHas(arg-1) is false:
+			send {eventmessage::nfe} to player
+			stop trigger
+		if {eventspawn-%arg-1%} is set:
+			teleport player to {eventspawn-%arg-1%}
+			set {_} to {eventmessage::tpe}
+			replace "{event}" with arg-1 in {_}
+			send {_} to player
+			stop trigger

@@ -1,0 +1,11 @@
+on step on water:
+	PlayerInEvent(player) is set
+	contains(blocks within {pos1-%PlayerInEvent(player)%} to {pos2-%PlayerInEvent(player)%}, yellow glass) is false
+	set {_} to {eventmessage::tfw}
+	replace "{event}" with PlayerInEvent(player) in {_}
+	send {_}
+	teleport player to {eventspawn-%PlayerInEvent(player)%}	
+function PlayerInEvent(p : player) :: text:
+	loop EventList():
+		contains(blocks within {pos1-%loop-value%} to {pos2-%loop-value%}, block at {_p}) is true
+		return loop-value
