@@ -1,0 +1,10 @@
+import:
+    org.bukkit.Bukkit
+    org.bukkit.scoreboard.DisplaySlot
+    
+function updateBelowName(p : player, t: text):
+    set {_board} to Bukkit.getScoreboardManager().getNewScoreboard()
+    set {_obj} to {_board}.registerNewObjective("tag", "dummy")
+    {_obj}.setDisplaySlot(DisplaySlot.BELOW_NAME)
+    {_obj}.setDisplayName({_t})
+    {_p}.setScoreboard({_board})
