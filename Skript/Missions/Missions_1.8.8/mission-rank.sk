@@ -1,0 +1,37 @@
+function UpdateRank(p : player):
+	MissionsWhatGroup({_p}) is not set:
+		send "&cHerhangi geçerli rütbede değilsiniz. Tekrar deneyiniz." to {_p}
+		stop
+		
+	loop MissionsWhatBreak({_p}):
+		{missions::variables::%{_p}%::break::%loop-value%} ? 0 < yaml value "missions-info.%MissionsWhatGroup({_p})%.missions.BREAK-BLOCK.%loop-value%" of "missions"
+		send "&c%loop-value% kırma görevi tamamlanmamış." to {_p}
+		stop
+		
+	loop MissionsWhatKillMob({_p}):
+		{missions::variables::%{_p}%::killmob::%loop-value%} ? 0 < yaml value "missions-info.%MissionsWhatGroup({_p})%.missions.KILL-MOB.%loop-value%" of "missions"
+		send "&c%loop-value% mob öldürme görevi tamamlanmamış." to {_p}
+		stop
+		
+	if total time of {_p} ? 0 < yaml value "missions-info.%MissionsWhatGroup({_p})%.missions.ONLINE" of "missions":
+		send "&cOynama süresi görevi tamamlanmamış." to {_p}
+		stop
+	
+	if balance of {_p} < yaml value "missions-info.%MissionsWhatGroup({_p})%.missions.MONEY" of "missions":
+		send "&cPara toplama görevi tamamlanmamış." to {_p}
+		stop
+	
+	if {lifetime::%{_p}%} < yaml value "missions-info.%MissionsWhatGroup({_p})%.missions.LIFETIME" of "missions":
+		send "&cHayatta kalma süresi görevi tamamlanmamış." to {_p}
+		stop
+		
+	#WolvSK şart
+	if asb island level of {_p} < yaml value "missions-info.%MissionsWhatGroup({_p})%.missions.ISLANDLEVEL" of "missions":
+		send "&cAda levelini henüz tamamlanmamış." to {_p}
+		stop
+		
+	set {_newrank} to yaml value "missions-info.%MissionsWhatGroup({_p})%.nextrank" of "missions"
+	set {_p}'s group to {_newrank}
+	delete {missions::variables::%{_p}%::*}
+	open MissionsMain({_p}) to {_p}
+	send "&a%{_p}% &7adlı oyuncu %{_newrank}% &7rütbesine &c/görev &7yaparak yükseldi. Kendisini tebrik ederiz." to players
