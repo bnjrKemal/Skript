@@ -1,0 +1,94 @@
+on load:
+	load yaml "plugins/Skript/scripts/Market/config.yml" as "config"
+function MarketMain(p : player) :: inventory:
+	set metadata tag "MarketMain" of {_p} to chest inventory with (yaml value "row" of "config") row with name yaml value "guiname" of "config"
+	set slot integers between 0 and (9 * (yaml value "row" of "config") - 1) of (metadata tag "MarketMain" of {_p}) to (yaml value "slotfrom0to26" of "config" parsed as material) named " "
+	loop yaml nodes with keys "market" of "config":
+		set slot (yaml value "market.%loop-value%.slot" of "config") of (metadata tag "MarketMain" of {_p}) to (yaml value "market.%loop-value%.icon" of "config" parsed as material) named loop-value
+	return (metadata tag "MarketMain" of {_p})
+on inventory click:
+	if name of event-inventory = yaml value "guiname" of "config":
+		cancel event
+		yaml path "market.%name of event-slot%" of "config" exists
+		open MarketSubmain(player, name of event-slot) to player
+	if contains(yaml nodes with keys "market" of "config", name of event-inventory) is true:
+		cancel event
+		if name of slot (yaml value "market.%name of event-inventory%.row" of "config" * 9 - 1) of event-inventory is yaml value "market.%name of event-inventory%.backicon-name" of "config":
+			if index of event-slot is yaml value "market.%name of event-inventory%.row" of "config" * 9 - 1:
+				open MarketMain(player) to player
+				stop
+			if event-slot is not air:
+				open MarketSelling(player, "%event-item.getType()%", name of event-inventory) to player
+		if name of slot (yaml value "market.%name of event-inventory%.backicon-slot" of "config") of event-inventory is yaml value "market.%name of event-inventory%.backicon-name" of "config":
+			event-slot is not air
+			if index of event-slot is yaml value "market.%name of event-inventory%.backicon-slot" of "config":
+				open MarketSubmain(player, name of event-inventory) to player
+				stop
+			set {_price::*} to (uncolored last element of (lore of event-item split at "||")) split at ";"
+			set {_itemtype} to type of event-item
+			set {_itemamount} to item amount of event-item
+			if event-click type is left mouse button:
+				if player has {_itemamount} of {_itemtype}:
+					add {_price::1} parsed as number to player's balance
+					remove {_itemamount} of {_itemtype} from player's inventory
+					loop yaml list "sell-message.successfully" of "config":
+						set {_send} to loop-value
+						replace "{item}" with "%event-item%" in {_send}
+						replace "{price}" with "%{_price::1}%" in {_send}
+						replace "{amount}" with "%item amount of event-item%" in {_send}
+						send {_send}
+					stop
+				else:
+					loop yaml list "sell-message.unsuccessfully" of "config":
+						send "%loop-value%"
+			if event-click type is right mouse button:
+				if player's balance > {_price::2} parsed as number:
+					remove {_price::2} parsed as number from player's balance
+					set {_itemtype} to type of event-item
+					set {_itemamount} to item amount of event-item
+					give {_itemamount} of {_itemtype} to player
+					loop yaml list "sell-message.successfullybuy" of "config":
+						set {_send} to loop-value
+						replace "{item}" with "%event-item%" in {_send}
+						replace "{price}" with "%{_price::2}%" in {_send}
+						replace "{amount}" with "%item amount of event-item%" in {_send}
+						send {_send}
+					stop
+				else:
+					loop yaml list "sell-message.unsuccessfullybuy" of "config":
+						send "%loop-value%"
+function MarketSelling(p : player, m: text, i : text, b: boolean=false) :: inventory:
+	set metadata tag "MarketSelling" of {_p} to chest inventory with 3 row with name {_i}
+	loop 1, 2, 4, 8, 16, 32 and 64:
+		delete {_lore::*}
+		loop yaml list "lore" of "config":
+			set {_lore::*} to "%{_lore::*} ? """"%||%loop-value-2%"
+		set {_price::*} to yaml value "market.%{_i}%.items.%{_m}%" of "config" split at ";"
+		if {_b} is true:
+			set {_price::1} to ({_price::1} parsed as number * loop-number) + (({_price::1} parsed as number * loop-number) * ({witch::random::%{_p}%::off} ? 0) / 100)
+			set {_price::2} to ({_price::2} parsed as number * loop-number) + (({_price::2} parsed as number * loop-number) * ({witch::random::%{_p}%::off} ? 0) / 100)
+		if {_b} is false:
+			set {_price::1} to ({_price::1} parsed as number * loop-number)
+			set {_price::2} to ({_price::2} parsed as number * loop-number)
+		replace "{sell}" with "%{_price::1}%" in {_lore::*}
+		replace "{buy}" with "%{_price::2}%" in {_lore::*}
+		set slot {_x} + 10 of (metadata tag "MarketSelling" of {_p}) to loop-number of ({_m} parsed as material) with lore "%{_lore::*}%||&0%{_price::1}%;%{_price::2}%" 
+		add 1 to {_x}
+	set slot (yaml value "market.%{_i}%.backicon-slot" of "config") of (metadata tag "MarketSelling" of {_p}) to yaml value "market.%{_i}%.backicon" of "config" parsed as material named yaml value "market.%{_i}%.backicon-name" of "config"
+	return metadata tag "MarketSelling" of {_p}
+function MarketSubmain(p : player, c : text) :: inventory:
+	set metadata tag "MarketSubmain" of {_p} to chest inventory with yaml value "market.%{_c}%.row" of "config" row with name {_c}
+	loop yaml nodes with keys "market.%{_c}%.items" of "config":
+		delete {_lore::*}
+		loop yaml list "lore" of "config":
+			set {_lore::*} to "%{_lore::*} ? """"%||%loop-value-2%"
+		set {_price::*} to yaml value "market.%{_c}%.items.%loop-value%" of "config" split at ";"
+		replace "{sell}" with "%{_price::1}%" in {_lore::*}
+		replace "{buy}" with "%{_price::2}%" in {_lore::*}
+		set slot {_x} + 0 of (metadata tag "MarketSubmain" of {_p}) to (loop-value parsed as material) with lore "%{_lore::*}%"
+		add 1 to {_x}
+	set slot yaml value "market.%{_c}%.row" of "config" * 9 - 1 of (metadata tag "MarketSubmain" of {_p}) to yaml value "backicon" of "config" parsed as material named yaml value "backicon-name" of "config"
+	return metadata tag "MarketSubmain" of {_p}
+command /market:
+	trigger:
+		open MarketMain(player) to player
