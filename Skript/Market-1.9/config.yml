@@ -1,0 +1,36 @@
+#§ = ALT + 21
+guiname: "§0Market"
+slotfrom0to26: black stained glass pane
+row: 3
+backicon: REDSTONE
+backicon-name: "&c← &7Geri dön."
+backicon-slot: 53 #bu kısım aktif değil
+
+sell-message:
+    unsuccessfully:
+    - "§cYeteri kadar öğen kalmadı."
+    - Birden fazla satır oluşturabilirsin.
+    successfully:
+    - §a{amount} adet {item} sattın. Hesabına {price} oyun parası eklendi.
+    - Birden fazla satır oluşturabilirsin. :P
+
+lore:
+- §r
+- §cSatış §f» §b{sell} oyun parası
+- §r
+
+market:
+    #MarketMain
+    "§6Çiftlik §eÜrünleri":
+        #Submain
+        icon: WHEAT
+        slot: 13
+        #Selling
+        backicon: REDSTONE
+        backicon-name: "&c← &7Geri dön."
+        backicon-slot: 0
+        row: 2
+        items:
+            STONE: 10
+            GLASS: 20
+            #..
