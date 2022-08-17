@@ -1,0 +1,137 @@
+options:
+	skyblock: "world"
+	witchname: "&5&lCadı Market"
+	witchsellingname: "&5&lCadı Market »"
+	lore: "&r||&bSatış &f» &3{sell}||&r"
+	yeterikadarparanyok: "&cYeteri kadar paran yok."
+	itemverildi: "&aBaşarıyla öğe verildi. Hesabınızdan {price} çekildi."
+	yeterikadaröğenyok: "&cYeteri kadar öğen yok."
+	itemsatıldı: "&cBaşarıyla item {price} oyun parasına satıldı."
+	invfull: "&cEnvanter dolu!"
+import:
+	org.bukkit.event.entity.ProjectileLaunchEvent
+on rightclick on witch:
+	name of target entity of player is {@witchname}
+	open WitchMarket(player) to player
+command /consolecommand-witherspawn:
+	executable by: console
+	trigger:
+		spawnWitchInIsland(getRandomPlayer())
+on ProjectileLaunchEvent:
+	"%event.getEntity().getShooter()%" is "witch"
+	event.setCancelled(true)
+function getRandomPlayer() :: location:
+	loop all players:
+		world of loop-player is {@skyblock}
+		return loop-player
+function spawnWitchInIsland(l : location):
+	wait 2 minutes
+	spawn witch at {_l}
+	set {_forkill} to last spawned entity
+	set display name of last spawned entity to {@witchname}
+	wait 30 minutes
+	kill {_forkill}
+	delete {witch::*}
+function WitchMarket(p : player) :: inventory:
+	set metadata tag "WitchMarket" of {_p} to chest inventory with 3 row with name {@witchname}
+	set slot integers between 0 and 26 of (metadata tag "WitchMarket" of {_p}) to black stained glass pane named " "
+	loop RandomItems({_p}, uuid of target entity of {_p}, 5):
+		add 1 to {_x}
+		set slot 10 + {_x} of (metadata tag "WitchMarket" of {_p}) to loop-value
+	return metadata tag "WitchMarket" of {_p}
+on inventory click:
+	if name of event-inventory is {@witchname}:
+		cancel event
+		index of event-slot is 11, 12, 13, 14 or 15
+		open WitchMarketSelling(player, event-item) to player
+	if name of event-inventory is {@witchsellingname}:
+		cancel event
+		index of event-slot is 10, 11, 12, 13, 14, 15 or 16
+		if player has event-item:
+			add item amount of event-item * SGPItemForSell(event-item) to player's balance
+			remove event-item from player's inventory
+			send "&aBaşarıyla satıldı."
+			stop
+		else:
+			send "&cYeteri kadar öğen yok."
+			stop
+function WitherItemContains(p : player, o: object) :: item type:
+	loop all items in {_p}'s inventory:
+		return 1 of loop-value named name of loop-item
+function WitchMarketSelling(p : player, m : material) :: inventory:
+	set metadata tag "WitchMarketSelling" of {_p} to chest inventory with 4 row with name {@witchsellingname}
+	set slot integers between 0 and 35 of (metadata tag "WitchMarketSelling" of {_p}) to black stained glass pane named " "
+	set {_sell} to SGPItemForSell({_m})
+	loop 1, 2, 4, 8, 16, 32 and 64:
+		set slot 10 + {_x} of (metadata tag "WitchMarketSelling" of {_p}) to loop-number of {_m}
+		set slot 19 + {_x} of (metadata tag "WitchMarketSelling" of {_p}) to loop-number of paper named " " with lore "&bSatış &f» &3%loop-number * ({_sell} + {_sell} * (SGPItemForOff({_p}, {_x}) / 100))%||&r"
+		add 1 to {_x}
+	return metadata tag "WitchMarketSelling" of {_p}
+on load:
+	load yaml "plugins/shops/config.yml" as "sgp.config"
+	load yaml "plugins/Skript/scripts/Cadı/items.yml" as "sgp.items"
+function RandomItems(p: player, u: text, i : integer) :: materials:
+	if {witch::%{_p}%::%{_u}%::*} is not set:
+		while (size of {witch::%{_p}%::%{_u}%::*}) < {_i}:
+			add 1 to {_x}
+			set {_c} to random element out of ((yaml nodes with keys "shops" of "sgp.config"))
+			set {_nodes} to random element out of (yaml nodes with keys "shops.%{_c}%.items" of "sgp.config")
+			set {_item} to yaml value "shops.%{_c}%.items.%{_nodes}%.item.material" of "sgp.config" parsed as material
+			SGPContains({witch::%{_p}%::%{_u}%::*}, {_item}) is false
+			add {_item} to {witch::%{_p}%::%{_u}%::*}
+			if {_sgpitem} is not set:
+				set {_sgpitem} to random element out of SGPRandomItems()
+				add {_sgpitem} to {witch::%{_p}%::%{_u}%::*}
+			{_x} > 20
+			stop
+	return {witch::%{_p}%::%{_u}%::*}
+function NormalForSell(m : material) :: number:
+	loop yaml nodes with keys "shops" of "sgp.config":
+		loop yaml nodes with keys "shops.%loop-value-1%.items" of "sgp.config":
+			yaml value "shops.%loop-value-1%.items.%loop-value-2%.item.material" of "sgp.config" parsed as material is {_m}
+			return yaml value "shops.%loop-value-1%.items.%loop-value-2%.sellPrice" of "sgp.config"
+function SGPContains(os: objects, o : object) :: boolean:
+	loop {_os::*}:
+		loop-value is {_o}
+		return true
+	return false
+command /cadımarket [<text>] [<text>]: #cadımarket şans fiyat
+	permission: op
+	trigger:
+		if arg-1 parsed as number and arg-2 parsed as number is not set:
+			send "&c/market <şans> <fiyat> &7##Eline öğe alarak"
+			stop trigger
+		if tool of player is air:
+			send "&cEline öğe almalısın."
+			stop trigger
+		if SGPContains(SGPAllItems(), (tool of player)) is true:
+			delete yaml nodes with keys "items.%SGPWhatNodes(tool of player)%" of "sgp.items"
+			save yaml "sgp.items"
+			send "&cBaşarıyla silindi."
+			stop trigger
+		set {_} to (size of SGPAllItems()) + 1
+		set yaml value "items.%{_}%.item" of "sgp.items" to tool of player
+		set yaml value "items.%{_}%.chance" of "sgp.items" to arg-1
+		save yaml "sgp.items"
+		send "&aBaşarıyla eklendi."
+function SGPAllItems() :: items:
+	loop yaml nodes with keys "items" of "sgp.items":
+		add yaml value "items.%loop-value%.items" of "sgp.items" to {_allitems::*}
+	return {_allitems::*}
+function SGPWhatNodes(m : material) :: object:
+	loop yaml nodes with keys "items" of "sgp.items":
+		yaml value "items.%loop-value%.item" of "sgp.items" is {_m}
+		return loop-value
+function SGPItemForSell(m : material) :: number:
+	if yaml value "items.%SGPWhatNodes({_m})%.sell" of "sgp.items" is set:
+		return yaml value "items.%SGPWhatNodes({_m})%.sell" of "sgp.items"
+	return NormalForSell({_m})
+function SGPItemForOff(p : player, i : integer) :: number:
+	if {witch::%{_p}%::%{_i}%} is not set:
+		set {witch::%{_p}%::%{_i}%} to random element out of numbers between -50 and 50 
+	return {witch::%{_p}%::%{_i}%}
+function SGPRandomItems() :: objects:
+	loop yaml nodes with keys "items" of "sgp.items":
+		chance of (yaml value "items.%loop-value%.chance" of "sgp.items") / 100
+		add yaml value "items.%loop-value%.item" of "sgp.items" to {_size::*}
+	return {_size::*}

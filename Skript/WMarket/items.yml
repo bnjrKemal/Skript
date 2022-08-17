@@ -1,0 +1,13 @@
+items:
+    '1':
+        item:
+            ==: org.bukkit.inventory.ItemStack
+            type: MOB_SPAWNER
+            meta:
+                ==: ItemMeta
+                meta-type: TILE_ENTITY
+                display-name: §eCow §fSpawner
+                internal: H4sIAAAAAAAAAONiYOBi4HPKyU/Ods0rySypDElM52DggLA9UxiYnfPLgSp4gjNzsoMLEsvzUouKORjYUsHyEFkGAAXyEJREAAAA
+                blockMaterial: MOB_SPAWNER
+        chance: 20
+        sell: 1000
