@@ -1,0 +1,4 @@
+arguments:
+    addstairs: "addstairs"
+    removestairs: "removestairs"
+    liststairs: "liststairs"

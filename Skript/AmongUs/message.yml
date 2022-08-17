@@ -1,0 +1,15 @@
+# § = ALT + 21
+message:
+    prefix: "&bAmong Us &f» "
+    nopermission: "§cBunun için yetkin yok."
+    
+    helpcommand:
+    - deneme1
+    - deneme2
+    - deneme3
+    - deneme4
+    - &6deneme6
+    
+    default-location:
+        add: "§aKoordinatı eklendi."
+        remove: "§cKoordinatı silindi."
