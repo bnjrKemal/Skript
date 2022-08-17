@@ -1,0 +1,148 @@
+options:
+	chestname: "&0&lM-&3&lToplayıcı &b&lSandık"
+	macviewing: "&0MAC Viewing"
+	material: 1 of chest named "&0&lM-&3&lToplayıcı &b&lSandık"
+	
+command /mac [<text="help">] [<text>] [<text>]:
+	permission: op
+	trigger:
+		if arg-1 is "help":
+			send "&6&m==========================="
+			send ""
+			send "&7&l→ &e/mac ekle <miktar> &fElinize öğe alarak fiyat ayarlayabilirsiniz."
+			send "&7&l→ &e/mac düzenle &fKaydedilen öğelerini görüntüleyebilir veya kaldırabilirsiniz."
+			send "&7&l→ &e/mac sandık &fMAC sandık verir."
+			send ""
+			send "&6&m==========================="
+			stop trigger
+		if arg-1 is "ekle":
+			if player's tool is air:
+				send "&4&l→ &cElinize öğe almalısınız."
+				stop trigger
+			if arg-2 parsed as number is not set:
+				send "&4&l→ &c2. argüment sayı olmalı."
+				stop trigger
+			set {_itemtype} to "%type of tool of player%"
+			if {mac::items::%{_itemtype}%} is set:
+				send "&4&l→ &cZaten elindeki öğe mevcut."
+				stop trigger
+			set {mac::items::%{_itemtype}%} to arg-2 parsed as number
+			send "&2&l→ &aElinizdeki öğe &f%arg-2% &afiyata ayarlandı."
+			stop trigger
+		if arg-1 is "düzenle":
+			open MACViewing() to player
+			stop trigger
+		if arg-1 is "sandık":
+			give {@material} to player
+			send "&2&l→ &aMAC sandığı verildi."
+			stop trigger
+
+function MACViewing() :: inventory:
+	set {_inv} to chest inventory with 6 row with name {@macviewing}
+	loop {mac::items::*}:
+		set slot {_x} + 0 of {_inv} to loop-index parsed as material with lore "", "&f» &a%loop-value% oyun parası" and "&c Kaldırmak için tıkla." and ""
+		add 1 to {_x}
+	return {_inv}
+
+on inventory click:
+	name of event-inventory is {@macviewing}
+	event-slot is not air
+	set {_text} to "%type of event-slot%"
+	delete {mac::items::%{_text}%}
+	remove event-slot from event-inventory
+	
+on place:
+	name of tool of player is {@chestname}
+	#add event-location to {mac::%player%::*}
+	set {mac::%event-location%::owner} to player
+	send "&2&l→ &aMAC sandığı koyuldu. Huni takarak çalıştırabilirsiniz."
+	MACHolo(event-location)
+	
+on break:
+	{mac::%event-location%::owner} is set
+	cancel event
+	if {mac::%event-location%::owner} is not player:
+		send "&4&l→ &cSandığın sahibi değilsin."
+		stop
+	if MACMoney(event-location) > 0:
+		send "&6&l→ &eSandığın içinde biriktirilen para bulunuyor. Sağ tıklayarak çekin sonra kırabilirsiniz."
+		stop
+	if items in event-block is set:
+		send "&6&l→  &cSandığın içinde biriktirilen öğeler bulunuyor. SHIFT + Sağ tıklayarak çekin sonra kırabilirsiniz."
+		stop
+	delete {mac::%event-location%::*}
+	set block to air
+	drop {@material} at event-location
+	send "&2&l→ &aMAC sandığı kırıldı."
+	MACHolo(event-location)
+
+import:
+	org.bukkit.event.inventory.InventoryMoveItemEvent
+
+on InventoryMoveItemEvent:
+	set {_location} to location of block at event.getDestination().getLocation()
+	{mac::%{_location}%::owner} is set
+	set {_type} to "%type of event.getItem()%"
+	{mac::items::%{_type}%} is set
+	MACHolo({_location})
+
+on rightclick:
+	{mac::%location of clicked block%::owner} is set
+	if tool of player is hopper:
+		player is sneaking
+		stop
+	cancel event
+	#cooldown
+	if difference between {mac::cooldown::%player%} and now is smaller than 5 seconds:
+		send action bar "&f&lLÜTFEN &c&lSPAMLAMAYIN&4&l!" to player
+		stop
+	else:
+		set {mac::cooldown::%player%} to now
+	#cooldown
+	if {mac::%location of clicked block%::owner} is not player:
+		send "&4&l→ &cSandığın sahibi değilsin."
+		stop
+	if MACMoney(location of clicked block) < 1:
+		send "&4&l→ &cHenüz biriktirilmiş para bulunmuyor."
+		stop
+	send "&2&l→ &aHesabınıza para aktarıldı. &b+&f%MACMoney(location of clicked block)%"
+	add MACMoney(location of clicked block) to player's balance
+	send MACClearChest(location of clicked block) to player
+	MACHolo(location of clicked block)
+
+function MACClearChest(l : location) :: text:
+	loop items in inventory of block at {_l}:
+		set {_type} to "%type of loop-item%"
+		if contains(indexes of {mac::items::*}, {_type}) is true:
+			remove loop-item from inventory of block at {_l}
+		else if contains(indexes of {mac::items::*}, {_type}) is false:
+			set {_alert} to true
+			if {mac::%{_l}%::owner} has enough space for loop-item:
+				add loop-item to {mac::%{_l}%::owner}'s inventory
+				remove loop-item from inventory of block at {_l}
+			else:
+				return "&4&l→ &cEnvanterinizde yer kalmadı. Boşaltıp tekrar gelmelisin."
+	if {_alert} is true:
+		return "&2&l→ &aSandığın içindeki öğeler envanterinize &ntamamen&a aktarıldı."
+
+function MACHolo(l : location):
+	delete holo {mac::holograms::%{_l}%}
+	wait a tick
+	{mac::%{_l}%::owner} is set
+	create holo with line {@chestname}, "", "&bSandığın sahibi", "&3» %{mac::%{_l}%::owner}%", "", "&6Biriktirilen miktar", "&e»%MACMoney({_l})%" and MACCase({_l}) at block 2.5 above {_l} and store in {mac::holograms::%{_l}%}
+
+function MACMoney(l : location) :: number:
+	loop items in inventory of (block at {_l}):
+		set {_type} to "%type of loop-item%"
+		contains(indexes of {mac::items::*}, {_type}) is true
+		add item amount of loop-item * {mac::items::%{_type}%} to {_money}
+	return {_money} ? 0
+	
+function MACCase(l : location) :: text:
+	return "&cEnvanter dolu." if (inventory of block at {_l}).firstEmpty() = -1
+	loop items in inventory of (block at {_l}):
+		set {_type} to "%type of loop-item%"
+		if contains(indexes of {mac::items::*}, {_type}) is false:
+			return "&cSatılmayan öğeler mevcut."
+		if contains(indexes of {mac::items::*}, {_type}) is true:
+			return "&dSatmak için tıkla!"
