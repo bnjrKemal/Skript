@@ -1,0 +1,85 @@
+on load:
+	load yaml "plugins/Skript/scripts/Kaptan/ayar.yml" as "ayar"
+command /fiyat [<text>] [<text>]:
+	permission: op
+	trigger:
+		if arg-1 is "ekle":
+			if player's tool is air:
+				send "&bAdmin &f» &cEline item almalısın."
+				stop trigger
+			if arg-2 parsed as number is not set:
+				send "&bAdmin &f» &cSayı olmalı."
+				stop trigger
+			set yaml value "fiyat.%tool of player%" of "ayar" to arg-2
+			send "&bAdmin &f» &3%tool of player% &f%arg-2% &3oyun parasına ayarlandı."
+			save yaml "ayar"
+			stop trigger
+		if arg-1 is "kaldır":
+			delete {kaptan::nospam::*}
+			open KaptanRemoveItem(player) to player
+			stop trigger
+		else:
+			send ""
+			send "&e/fiyat ekle <fiyat> &7Elinize item alarak fiyat ayarlayabilirsiniz."
+			send "&e/fiyat kaldır &7Kaldırmak istediklerini buradan sağlayabilirsiniz. &c(!) Bu komutu basarsanız hafta içinde aynı itemler tekrarlanır. Gerekmediği sürece kullanmayın."
+			send ""
+command /kaptan:
+	trigger:
+		open KaptanGUI(player) to player
+function KaptanGUI(p : player) :: inventory:
+	set metadata tag "KaptanGUI" of {_p} to chest inventory with 3 row with name "&3Kaptan"
+	set slot integers between 0 and 26 of (metadata tag "KaptanGUI" of {_p}) to black stained glass pane named " "
+	if {kaptan::random::%now formatted as ""w""%} is not set:
+		loop (yaml nodes with keys "fiyat" of "ayar"):
+			contains({kaptan::nospam::*}, loop-value) is false
+			add loop-value to {_selling::*}
+		set {_r} to random element out of {_selling::*}
+		if {_r} is not set:
+			set slot 13 of (metadata tag "KaptanGUI" of {_p}) to 0 of barrier named "&f! &cUyarı &f!" with lore "&r||&cSatılacak öğem kalmadı.||&r"
+			return (metadata tag "KaptanGUI" of {_p})
+		add {_r} to {kaptan::nospam::*}
+		set {kaptan::random::%now formatted as ""w""%} to {_r} parsed as material
+	set {_r} to {kaptan::random::%now formatted as ""w""%}
+	set {_f} to yaml value "fiyat.%{_r}%" of "ayar"
+	if {kaptan::onesell::%{_p}%::%now formatted as ""w""%} is not true:
+		set slot 13 of (metadata tag "KaptanGUI" of {_p}) to {_r} with lore "&r||&aFiyat &f» &2%{_f}%||&r||&f• &7Satın almak için tıkla.||&r"
+	else if {kaptan::onesell::%{_p}%::%now formatted as ""w""%} is true:
+		set slot 13 of (metadata tag "KaptanGUI" of {_p}) to 0 of {_r} named "&cZaten bu hafta satışını gerçekleştirdin."
+	return (metadata tag "KaptanGUI" of {_p})
+function contains(os: objects, o : object) :: boolean:
+	loop {_os::*}:
+		loop-value is {_o}
+		return true
+	return false
+function KaptanRandom() :: material:
+	return {kaptan::random::%now formatted as ""w""%}
+function KaptanRemoveItem(p : player) :: inventory:
+	set metadata tag "KaptanRemoveItem" of {_p} to chest inventory with 3 row with name "&0Item Kaldır"
+	loop yaml nodes with keys "fiyat" of "ayar":
+		set {_f} to yaml value "fiyat.%loop-value%" of "ayar"
+		set slot {_x} + 0 of (metadata tag "KaptanRemoveItem" of {_p}) to loop-value parsed as material with lore "&r||&cFiyat &f» &e%{_f}% oyun parası||&r||&cKaldırmak için tıkla.||&r"
+		add 1 to {_x}
+	return (metadata tag "KaptanRemoveItem" of {_p})
+on inventory click:
+	if name of event-inventory is "&0Item Kaldır":
+		cancel event
+		set {_event-slot} to type of event-slot
+		set item amount of {_event-slot} to item amount of event-slot
+		delete yaml value "fiyat.%{_event-slot}%" of "ayar"
+		set slot (index of event-slot) of event-inventory to air
+		save yaml "ayar"
+	if name of event-inventory is "&3Kaptan":
+		cancel event
+		item amount of event-slot > 0
+		if index of event-slot is 13:
+			set {_event-slot} to type of event-slot
+			set item amount of {_event-slot} to item amount of event-slot
+			set {_f} to yaml value "fiyat.%{_event-slot}%" of "ayar"
+			if {_f} > player's balance:
+				send "&cYeteri kadar paran yok."
+				stop trigger
+			remove {_f} from player's balance
+			add {_event-slot} to player's inventory
+			send "&f• &bBaşarıyla satın alındı."
+			set {kaptan::onesell::%player%::%now formatted as ""w""%} to true
+			open KaptanGUI(player) to player
