@@ -1,0 +1,16 @@
+on load:
+    send "&aVeri düzenleme fonksiyonu başladı. %(size of {ormanlokasyon::*})/20% saniye sonra bitecek." to ops
+    loop {ormanlokasyon::*}:
+        wait a tick
+        if last 5 characters of loop-index is "death":
+            delete {ormanlokasyon::%loop-index%}
+            set {newormanlokasyon::death::%deleteonechar(loop-index, 5)%} to loop-value
+        if last 1 characters of loop-index is "1":
+            set {newormanlokasyon::%deleteonechar(loop-index, 1)%} to loop-value
+            delete {ormanlokasyon::%loop-index%}
+    send "&aVeri düzenleme fonksiyonu bitti. &6/plugins/Skript/scripts/%script%&a dosyasındaki 35. satırdan sonraki kod bloklarını sil." to ops
+function deleteonechar(t: text, int: integer) :: text:
+    loop {_t} split at "":
+        size of {_t} split at "" > size of {_s} split at "" + {_int}
+        set {_s} to "%{_s} ? """"%%loop-value%"
+    return {_s} ? {_t}
