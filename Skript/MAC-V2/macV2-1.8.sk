@@ -1,0 +1,162 @@
+options:
+	chestname: "&bM-&3AutoChest"
+on load:
+	load yaml "plugins/Skript/scripts/MAC-V2/items.yml" as "mac-items"
+	load yaml "plugins/Skript/scripts/MAC-V2/data.yml" as "mac-data"
+command /mac [<text="help">] [<text>] [<text>]:
+	permission: op
+	trigger:
+		if arg-1 is "help":
+			send "&6&m==========================="
+			send ""
+			send "&7&l→ &e/mac ekle <miktar> &fElinize öğe alarak fiyat ayarlayabilirsiniz."
+			send "&7&l→ &e/mac düzenle &fKaydedilen öğelerini görüntüleyebilir veya kaldırabilirsiniz."
+			send "&7&l→ &e/mac sandık &fMAC sandık verir."
+			send ""
+			send "&6&m==========================="
+			stop trigger
+		if arg-1 is "ekle":
+			if player's tool is air:
+				send "&4&l→ &cElinize öğe almalısınız."
+				stop trigger
+			if arg-2 parsed as number is not set:
+				send "&4&l→ &c2. argüment sayı olmalı."
+				stop trigger
+			if contains(MACListingItems(), type of tool of player) is true:
+				send "&4&l→ &cZaten elindeki öğe mevcut."
+				stop trigger
+			set yaml value "%type of tool of player%" of "mac-items" to arg-2
+			send "&2&l→ &aElinizdeki öğe &f%arg-2% &afiyata ayarlandı."
+			save yaml "mac-items"
+			stop trigger
+		if arg-1 is "düzenle":
+			open MACViewing(player) to player
+			stop trigger
+		if arg-1 is "sandık":
+			give 1 of chest named {@chestname} to player
+			send "&2&l→ &aMAC sandığı verildi."
+			stop trigger
+function MACViewing(p : player) :: inventory:
+	set metadata tag "MACViewing" of {_p} to chest inventory with 6 row with name "&0MAC Viewing"
+	loop MACListingItems():
+		set {_fiyat} to yaml value "%loop-value%" of "mac-items"
+		set slot {_x} + 0 of (metadata tag "MACViewing" of {_p}) to loop-value with lore "&r||&f» &a%{_fiyat}% oyun parası||&c Kaldırmak için tıkla.||&r"
+		add 1 to {_x}
+	return (metadata tag "MACViewing" of {_p})
+on inventory click:
+	name of event-inventory is "&0MAC Viewing"
+	event-slot is not air
+	delete yaml value "%event-item%" of "mac-items"
+	save yaml "mac-items"
+	remove event-slot from event-inventory
+function MACListingItems() :: materials:
+	loop yaml nodes with keys "" of "mac-items":
+		add loop-value parsed as material to {_l::*}
+	return {_l::*}
+function contains(os: objects, o: object) :: boolean:
+	loop {_os::*}:
+		loop-value is {_o}
+		return true
+	return false
+on place:
+	IsMACChest(location of event-block) is true
+	add location of event-block to yaml list "%player%" of "mac-data"
+	add location of event-block to yaml list "all-chest" of "mac-data"
+	save yaml "mac-data"
+	send "&2&l→ &aMAC sandığı koyuldu. Huni takarak çalıştırabilirsiniz."
+	MACReHolo(location of event-block)
+on break:
+	IsMACChest(location of event-block) is true
+	if contains(yaml list "%player%" of "mac-data", location of event-block) is false:
+		send "&4&l→ &cSandığın sahibi değilsin."
+		cancel event
+		stop
+	if (yaml value "money.%location of event-block%" of "mac-data") ? 0 > 0:
+		send "&6&l→ &eSandığın içinde biriktirilen para bulunuyor. Sağ tıklayarak çekin sonra kırabilirsiniz."
+		cancel event
+		stop
+	if items in inventory of event-block is set:
+		send "&6&l→ &eSandığın içinde biriktirilen, satılmayan, öğe bulunuyor. Shift + Sağ tıklayarak çekin sonra kırabilirsiniz."
+		cancel event
+		stop
+	cancel event
+	set event-block to air
+	drop 1 of chest named {@chestname} at event-block
+	remove location of event-block from yaml list "%player%" of "mac-data"
+	save yaml "mac-data"
+	send "&2&l→ &aMAC sandığı kırıldı."
+	MACReHolo(location of event-block)
+function MACReHolo(l : location):
+	set {_money} to (yaml value "money.%{_l}%" of "mac-data")
+	delete holo {holograms::macv2::%{_l}%}
+	wait a tick
+	IsMACChest({_l}) is true
+	create holo with line "&bSandığın sahibi", "&3» %MACOwner({_l})%", "", "&6Biriktirilen miktar", "&e»%{_money} ? 0%" and MACInChestItems({_l}) at block 2 above {_l} and store in {holograms::macv2::%{_l}%}
+function MACInChestItems(l : location) :: text:
+	if (inventory of block at {_l}).firstEmpty() = -1:
+		return "&cEnvanter dolu."
+	if items in block at {_l} is set:
+		return "&cSatılmayıp biriken öğeler mevcut."
+	if items in block at {_l} is not set:
+		return "&aSatılmayıp biriken öğeler mevcut değil."	
+function MACOwner(l : location) :: text:
+	if contains(yaml list "all-chest" of "mac-data", {_l}) is true:
+		loop yaml nodes with keys "" of "mac-data":
+			loop-value is not "all-chest"
+			contains(yaml list loop-value of "mac-data", {_l}) is true
+			return loop-value
+	return "&cSahibi yok."
+function IsMACChest(b: location) :: boolean:
+	if (name of inventory of block at {_b}) is {@chestname}:
+		block at {_b} is chest
+		return true
+	return false
+import:
+	org.bukkit.event.inventory.InventoryMoveItemEvent
+on InventoryMoveItemEvent:
+	contains(yaml list "all-chest" of "mac-data", location of block at event.getDestination().getHolder().getLocation()) is true
+	set {_x} to "%event.getItem()%"
+	set {_x} to {_x} parsed as material
+	set {_x.item} to type of {_x}
+	set {_x.amount} to item amount of {_x}
+	wait a tick
+	yaml value "%{_x.item}%" of "mac-items" is set
+	set yaml value "money.%location of block at event.getDestination().getHolder().getLocation()%" of "mac-data" to (yaml value "money.%location of block at event.getDestination().getHolder().getLocation()%" of "mac-data") + (yaml value "%{_x.item}%" of "mac-items") * {_x.amount}
+	remove {_x} from (block at event.getDestination().getHolder().getLocation())
+	save yaml "mac-data"
+	MACReHolo(location of block at event.getDestination().getHolder().getLocation())
+on rightclick:
+	IsMACChest(location of clicked block) is true
+	if tool of player is hopper:
+		player is sneaking
+		stop
+	cancel event
+	if contains(yaml list "%player%" of "mac-data", location of clicked block) is false:
+		send "&4&l→ &cSandığın sahibi değilsin."
+		stop
+	if player is not sneaking:
+		if (yaml value "money.%location of clicked block%" of "mac-data") ? 0 < 1:
+			send "&4&l→ &cHenüz satılabilecek öğe almadığından biriktirilmiş para bulunmuyor."
+			stop
+		set {_money} to yaml value "money.%location of clicked block%" of "mac-data"
+		send "&2&l→ &aHesabınıza para aktarıldı. &b+&f%{_money} ? 0%"
+		delete yaml value "money.%location of clicked block%" of "mac-data"
+		add {_money} ? 0 to player's balance
+		save yaml "mac-data"
+	if player is sneaking:
+		if items in inventory of clicked block is not set:
+			send "&4&l→ &cSandığın içi boş."
+			stop
+		if items in inventory of clicked block is set:
+			send "&6&l→ &eSandığın içindeki öğeler envanterinize aktarılıyor.."
+		loop items in inventory of clicked block:
+			if player has enough space for loop-item:
+				add loop-item to player's inventory
+				remove loop-item from inventory of clicked block
+			else:
+				send "&4&l→ &cEnvanterinizde yer kalmadı."
+				stop loop
+				stop
+		if items in inventory of clicked block is not set:
+			send "&2&l→ &aSandığın içindeki öğeler envanterinize &ntamamen&a aktarıldı."
+	MACReHolo(location of clicked block)

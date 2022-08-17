@@ -1,0 +1,31 @@
+
+Maxwell AutoChest V2
+
+Her sürümde geçerli olan gereksinimler;
+	Skript-mirror https://skripttools.net/dl/skript-mirror+2.0.0-SNAPSHOT.jar
+	Skript-yaml https://skripttools.net/dl/skript-yaml+1.3.2.jar
+	Skript-holo https://skripttools.net/dl/skript-holo+1.0.2.jar
+	Holographicdisplay https://dev.bukkit.org/projects/holographic-displays/files/3031273
+
+1.8 için;
+	Skript sürüm » dev36 https://github.com/SkriptLang/Skript/releases/tag/dev36
+	
+	En az sürüm dev36 olmalıdır.
+	
++1.9 için
+	Skript sürüm » 2.5 https://github.com/SkriptLang/Skript/releases/tag/2.5
+	
+	
+	Son güncelleme tarihi
+			8/10/2020 01:28
+			
+	Skript yapımcısı 
+		Discord Maxwell#7329
+		
+	Bu skript ücretsizdir. Ücretli paylaşılması ve izinsizce satılması yasaktır.
+	Her hangi bir sorun tespit ettiğinizde bana discorddan ulaşabilirsiniz..
+	Skripti MAC-V2 adlı klasör olarak kullanınız.
+	Skripte reload atma komutu: /sk reload MAC-V2/
+	
+	
+	&mInception Team/Skripter sunar.
