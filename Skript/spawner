@@ -1,0 +1,150 @@
+options:
+	spawnerçalıştırmaitemi: 64 of paper
+	spawnersüresi: 30 day
+command /sanalsp:
+	trigger:
+		SanalSpawnerGUI(player)
+function SanalSpawnerGUI(p : player):
+	open virtual chest with 3 row named "Sanal Spawner" to {_p}
+	make gui slot integers between 0 and 26 of {_p} with black stained glass pane named " " to nothing
+	set {_now} to yaml value "player.%{_p}%" of "sanalspplayer"
+	if {_now} is bigger than now:
+		make gui slot 13 of {_p} with {skull::list::ssp} named "&eSanal Spawner Kullanımı" with lore "", "", "&a Sanal Spawner son kullanım tarihi;", "", "&d %{_now}%", "" and "" to nothing
+	else:
+		if yaml value "player.%{_p}%" of "sanalspplayer" is set:
+			delete yaml value "player.%{_p}%" of "sanalspplayer"
+			save yaml "sanalspplayer"
+		make gui slot 13 of {_p} with {skull::list::ssp} named "&eSanal Spawner Kullanımı" with lore "", "", "&c Sanal Spawner kullanabilmek için", "&c 64 bonus toplamalısın.", "" and "", "&f ( &aTıkla &f)" to run function SanalSpawnerKullanimi({_p})
+	make gui slot 10 of {_p} with {skull::list::sspdepo} named "&eSanal Spawner Deposu" with lore "", "", "&7 Sanal Spawner'den çıkan eşyalar", "&7 buraya depolanır.", "" and "", "&f ( &aTıkla &f)" to run function SanalSpawnerDepo({_p})
+	make gui slot 16 of {_p} with {skull::list::sspfuel} named "&eSanal Spawner Yakıtı" with lore "", "", "&7 Sanal Spawner'in çalışması için", "&7 yakıt doldurmalısın.", "" and "", "&f ( &aTıkla &f)" to run function SanalSpawnerWork({_p})
+function SanalSpawnerWork(p : player):
+	open virtual chest with 5 row named "Sanal Spawner Yakıtı" to {_p}
+	set {_x} to 1
+	loop yaml nodes with keys "spawners.items" of "sanalspconfig":
+		set {_item} to yaml value "spawners.items.%loop-value%.item" of "sanalspconfig"
+		make gui slot {_x} of {_p} with {_item} to nothing
+		add 1 to {_x}
+	make gui slot integers between 9 and 17 of {_p} with black stained glass pane named "&8♦" to nothing
+	make gui slot 0 of {_p} with {skull::list::exitleft} named "&cMenü" with lore "" to run function SanalSpawnerGUI({_p})
+	make gui slot 8 of {_p} with {skull::list::exitright} named "&cMenü" with lore "" to run function SanalSpawnerGUI({_p})
+	make gui slot integers between 18 and 44 of {_p} with purple stained glass pane named "&5♦" to nothing
+	make gui slot 34 of {_p} with {skull::list::mavisandik} named "&aDoldur" with lore "" to run function SanalSpawnerInventoryControl({_p})
+	remove gui slot integers between 28 and 32 of {_p}
+function SanalSpawnerDepo(p : player):
+	open virtual chest with 6 row named "Sanal Spawner Deposu" to {_p}
+	make gui slot integers between 0 and 53 of {_p} with light gray stained glass pane named " " to nothing
+	make gui slot 0 of {_p} with {skull::list::exitleft} named "&cMenü" with lore "" to run function SanalSpawnerGUI({_p})
+	make gui slot 8 of {_p} with {skull::list::exitright} named "&cMenü" with lore "" to run function SanalSpawnerGUI({_p})
+	make gui slot integers between 9 and 17 of {_p} with black stained glass pane named "&8♦" to nothing
+	set {_x} to 18
+	loop yaml nodes with keys "date.%{_p}%.realtime" of "sanalspplayer":
+		set {_time} to loop-value
+		SanalSpawnerTimeSpan("%{_time}%") is true
+		set {_fuel} to yaml value "date.%{_p}%.realtime.%loop-value%" of "sanalspplayer"
+		add 6 * {_fuel} of iron ingot to {%{_p}%::spdepo::*}
+		delete yaml value "date.%{_p}%.realtime.%loop-value%" of "sanalspplayer"
+		save yaml "sanalspplayer"
+	loop {%{_p}%::spdepo::*}:
+		make gui slot {_x} of {_p} with loop-value to nothing
+		add 1 to {_x}
+	if {%{_p}%::spdepo::*} is set:
+		make gui slot 53 of {_p} with {skull::list::dolukutu} named " " with lore "", "&cDepoyu toplamak için tıkla!" and "" to run function SpawnerDepoyuTopla({_p})
+	else:
+		make gui slot 53 of {_p} with {skull::list::boskutu} named " " with lore "&cDepo boş!" and "" to nothing
+function SanalSpawnerTimeSpan(time: text) :: boolean:
+	set {_time} to "%{_time}%" parsed as date formatted as "dd/MM/yyyy HH:mm:ss"
+	if {_time} is smaller than or equal to now:
+		send "%{_time}%" to ops
+		return true
+	return false
+function SpawnerDepoyuTopla(p : player):
+	loop {%{_p}%::spdepo::*}:
+		if {_p} has enough space for loop-value:
+			add loop-value to {_p}'s inventory
+			remove loop-value from {%{_p}%::spdepo::*}
+		else:
+			stop loop
+	SanalSpawnerDepo({_p})
+function SanalSpawnerKullanimi(p : player):
+	{_p} has {@spawnerçalıştırmaitemi}
+	remove {@spawnerçalıştırmaitemi} from {_p}
+	set {_now} to now
+	add {@spawnersüresi} to {_now}
+	set yaml value "player.%{_p}%" of "sanalspplayer" to {_now}
+	SanalSpawnerGUI({_p})
+	save yaml "sanalspplayer"
+import:
+	org.bukkit.event.inventory.InventoryEvent
+expression inventory view title:
+	return type: text
+	get:
+		return event.getView().getTitle()
+on inventory close:
+	inventory view title is "Sanal Spawner Yakıtı"
+	SanalSpawnerInventoryControl(player)
+function SanalSpawnerInventoryControl(p : player):
+	set {_dakika} to 0
+	loop 28, 29, 30, 31 and 32:
+		set {_ininvitem} to slot loop-value-1 of {_p}'s current inventory
+		{_ininvitem} is not air
+		set {_katsayi} to item amount of slot loop-value-1 of {_p}'s current inventory
+		set item amount of {_ininvitem} to 1
+		if contains({_ininvitem}) is true:
+			SanalSpawnerMinFunc({_p}, "%{sanalsp::dk::%{_ininvitem}%}%", "%{_katsayi}%")
+		if contains({_ininvitem}) is false:
+			add {_katsayi} of {_ininvitem} to {_p}'s inventory
+		delete slot loop-value-1 of {_p}'s current inventory
+function SanalSpawnerMinFunc(p : player , dk : text, ks : text):
+	set {_now} to now
+	set {_dk} to ("%{_dk}%" parsed as integer)
+	set {_ks} to ("%{_ks}%" parsed as integer)
+	set {_vrlcksure} to {_ks} * {_dk}
+	send "%{_ks}% * %{_dk}% - %{_vrlcksure}%" to {_p}
+	add "%{_vrlcksure}% minutes" parsed as timespan to {_now}
+	if yaml value "date.%{_p}%.realtime.%{_now}%" of "sanalspplayer" is set:
+		set {_oldtime} to yaml value "date.%{_p}%.realtime.%{_now}%" of "sanalspplayer"
+		set {_vrlcksure} to {_vrlcksure} + {_oldtime}
+	set yaml value "date.%{_p}%.realtime.%{_now}%" of "sanalspplayer" to {_vrlcksure}
+	save yaml "sanalspplayer"
+function contains(test: object) :: boolean:
+	loop yaml nodes with keys "spawners.items" of "sanalspconfig":
+		yaml value "spawners.items.%loop-value%.item" of "sanalspconfig" is {_test}
+		return true
+		stop
+	return false
+on load:
+	delete {sanalsp::dk::*}
+	loop yaml nodes with keys "spawners.items" of "sanalspconfig":
+		set {_item} to yaml value "spawners.items.%loop-value%.item" of "sanalspconfig"
+		set {sanalsp::dk::%{_item}%} to yaml value "spawners.items.%loop-value%.süre" of "sanalspconfig"
+# ---------------------------------------------------------------------------------
+on load:
+	load yaml "plugins/SanalSpawner/config.yml" as "sanalspconfig"
+	load yaml "plugins/SanalSpawner/player.yml" as "sanalspplayer"
+command /adminsanalsp [<text>] [<text>] [<integer>]:
+	permission: admin.spawner
+	trigger:
+		if arg-1 is "ekle":
+			if arg-2 is set:
+				if arg-3 is integer:
+					if tool of player is not air:
+						set yaml value "spawners.items.%arg-2%.item" of "sanalspconfig" to tool of player
+						set yaml value "spawners.items.%arg-2%.süre" of "sanalspconfig" to arg-3
+						send "&aEklendi: &e%tool of player% &f- &eher %arg-3% dakika" to player
+						save yaml "sanalspconfig"
+						stop trigger
+					else:
+						send "&cElin boş."
+						stop trigger
+		if arg-1 is "liste":
+			set {_x} to 0
+			open virtual chest with 3 row named "Admin Sanal Spawner" to player
+			loop yaml nodes with keys "spawners.items" of "sanalspconfig":
+				set {_item} to yaml value "spawners.items.%loop-value%.item" of "sanalspconfig"
+				make gui slot {_x} of player with {_item} to run function AdminSanalSpawnerGUIGive(player, {_item})
+				add 1 to {_x}
+			stop trigger
+		send "&cHatalı kullanım: &e/adminsanalsp [ekle|liste<text>] [isim<text>] [dakika<int>]"
+		stop trigger
+function AdminSanalSpawnerGUIGive(p : player, item: material):
+	give 1 of {_item} to {_p}
