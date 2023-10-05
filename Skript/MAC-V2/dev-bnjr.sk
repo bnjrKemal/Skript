@@ -1,5 +1,0 @@
-function contains(os: objects, o: object) :: boolean:
-	loop {_os::*}:
-		loop-value is {_o}
-		return true
-	return false
