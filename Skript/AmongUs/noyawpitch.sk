@@ -1,9 +1,0 @@
-function noyawpitch(l : location) :: location:
-	set {_x} to x-coordinate of {_l}
-	set {_y} to y-coordinate of {_l}
-	set {_z} to z-coordinate of {_l}
-	
-	set {_yaw} to yaw of {_l}
-	set {_pitch} to pitch of {_l}
-	
-	return location({_x}, {_y}, {_z}, world of {_l}, {_yaw} and {_pitch})

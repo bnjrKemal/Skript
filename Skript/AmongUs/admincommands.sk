@@ -1,9 +1,0 @@
-command /among-us [<text>]:
-	permission: op
-	permission message: %{among-us::prefix}% %{among-us::nopermission}%
-	trigger:
-		if arg-1 is not {among-us::argument::addstairs}, {among-us::argument::removestairs} or {among-us::argument::liststairs}:
-			send {among-us::helpcommand::*} to player
-			stop trigger
-		if arg-1 is {among-us::argument::addstairs}:
-			
